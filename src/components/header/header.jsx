@@ -46,7 +46,8 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     flex: 1,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    bordeRadius: '5px'
   },
   links: {
     display: 'flex'
@@ -187,18 +188,15 @@ class Header extends Component {
           <div className={ classes.icon }>
             <img
               alt=""
-              src={ require('../../assets/YFI-logo.png') }
+              src={ require('../../assets/protekt-logo.png') }
               height={ '40px' }
               onClick={ () => { this.nav('') } }
             />
-            <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>yearn.finance</Typography>
+            <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>Protekt Protocol</Typography>
           </div>
           <div className={ classes.links }>
             { this.renderLink('dashboard') }
             { this.renderLink('vaults') }
-            { this.renderLink('earn') }
-            { this.renderLink('zap') }
-            { this.renderLink('cover') }
             { this.renderLink('stats') }
           </div>
           <div className={ classes.account }>
