@@ -88,7 +88,7 @@ const styles = theme => ({
       paddingBottom: '24px'
     }
   },
-  socials: {
+  community: {
     padding: '0px 24px'
   }
 });
@@ -125,8 +125,8 @@ class Footer extends Component {
             width={ '120px' }
           />
         </div>
-        <div className={ classes.socials }>
-          <Typography className={ classes.heading } variant={ 'h6'}>Socials</Typography>
+        <div className={ classes.community }>
+          <Typography className={ classes.heading } variant={ 'h6'}>Community</Typography>
           <div  className={ classes.link } onClick={()=> window.open("https://twitter.com/protektprotocol", "_blank")} >
             <img alt="" src={ require('../../assets/twitter.svg') } height='24px' className={ classes.icon } />
             <Typography variant={ 'h4'} >Twitter</Typography>
