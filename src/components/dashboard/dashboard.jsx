@@ -66,7 +66,7 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     minWidth: '100%',
-    marginTop: '40px',
+    marginTop: '20px',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
     }
