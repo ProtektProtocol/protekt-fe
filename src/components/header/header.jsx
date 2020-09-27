@@ -196,8 +196,7 @@ class Header extends Component {
           </div>
           <div className={ classes.links }>
             { this.renderLink('dashboard') }
-            { this.renderLink('vaults') }
-            { this.renderLink('stats') }
+            { this.renderLink('pools') }
           </div>
           <div className={ classes.account }>
             { address &&

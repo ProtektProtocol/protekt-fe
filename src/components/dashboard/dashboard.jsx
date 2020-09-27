@@ -7,6 +7,7 @@ import {
   MenuItem
 } from '@material-ui/core';
 import { colors } from '../../theme'
+import ReactMarkdown from 'react-markdown'
 
 import Loader from '../loader'
 import InfoIcon from '@material-ui/icons/Info';
@@ -47,6 +48,18 @@ const styles = theme => ({
     }
   },
   investedContainer: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    minWidth: '100%',
+    marginTop: '40px',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '900px',
+    }
+  },
+  investedContainer2: {
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
@@ -189,6 +202,29 @@ const styles = theme => ({
     alignItems: 'center'
   }
 });
+
+const markdown = `
+Protekt Protocol puts crypto to work insuring users against hacks, bugs, and exploits of any DeFi protocol. Just as [Uniswap](https://uniswap.org/) allows any token to have a spot market, Protekt allows any smart contract to be insured by stakers. The goal is to support and catalyze the growth of the DeFi ecosystem by protecting users from getting rekt.
+
+Along with being a smart contract protocol, an allocation of protocol treasury will be used for grants to continually audit and secure other DeFi money legos, so the ecosystem can all grow safely together!
+
+## DeFi Risk
+Building on the work of awesome projects like [DeFi Score](https://defiscore.io/), [Nexus Mutual](https://nexusmutual.io/), [Aave's Safety Modules](https://docs.aave.com/aavenomics/safety-module), and others, we believe that large technical and financial vulnerabilities are the **biggest risk to a thriving DeFi community** over the next few years. Smart contracts that contain large amounts of value face the following risks:
+1. Smart Contract Risk - Technical bugs that can expose funds to hackers
+2. Financial Risk - Collateral falls below outstanding obligations, likely due to price movement, or low liquidity leads to locked funds
+3. Centralization Risk - Centralized admin keys are stolen or used nefariously or oracles are manipulated to allow an exploit
+
+Especially as new money legos are created, snapped together, and remixed weekly, the risks multiply and become a bottleneck to more capital flowing into the space. New entrants need signaling and assurance of the projects they can trust and commit capital as well as recapitalization if a [Shortfall Event](https://docs.aave.com/aavenomics/terminology#shortfall-event-se) occurs.
+
+To fulfill this need, Protekt Protocol introduces a new insurance marketplace with several innovative features:
+* 📜 ANYONE can back ANY capital pool with a customizable insurance contract
+* 💸 Mint wrapped tokens with built in coverage (never "buy cover")
+* 🛡 Staking pools with shield mining incentives
+* 🔀 Configurable claims processes via automated rules or a DAO
+* 🏦 Payouts trigger a liquidation waterfall to spread risk through various tranches.
+
+The protocol  was inspired and uses money legos from yearn, Aave, Compound, Balancer, Maker, rDAi, and others. The very best in DeFi.
+`
 
 class Dashboard extends Component {
 
@@ -334,6 +370,9 @@ class Dashboard extends Component {
               </div>
             }
           </div>
+
+
+
           { this.renderBasedOn() }
           { (dashboard.vaults && dashboard.vaults.length > 0) &&
             <div className={ classes.vaultContainer }>

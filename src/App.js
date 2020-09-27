@@ -94,7 +94,7 @@ class App extends Component {
                 <Header />
                 <Manage />
               </Route>
-              <Route path="/vaults">
+              <Route path="/pools">
                 <Header />
                 <Vaults />
               </Route>

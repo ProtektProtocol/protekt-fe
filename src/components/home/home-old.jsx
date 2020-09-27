@@ -157,7 +157,7 @@ const styles = theme => ({
   cover: {
     backgroundColor: colors.white,
     '&:hover': {
-      backgroundColor: colors.protektGreen,
+      backgroundColor: colors.compoundGreen,
       '& .title': {
         color: colors.white,
       },
@@ -172,10 +172,10 @@ const styles = theme => ({
       }
     },
     '& .title': {
-      color: colors.protektGreen,
+      color: colors.compoundGreen,
     },
     '& .icon': {
-      color: colors.protektGreen
+      color: colors.compoundGreen
     },
     '& .description': {
       display: 'none'
@@ -213,15 +213,35 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('dashboard') } }>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'dashboard') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>Dashboard</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "See general information about Protekt Protocol and what you currently have covered."}</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get a quick glance at how your portfolio is growing while invested in yearn's products." }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('pools') }}>
+        <Card className={ `${classes.card} ${classes.vault}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
+          <PieChartIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Vaults") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Vaults follow unique strategies that are designed to maximize the yield of the deposited asset and minimize risk." }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'earn') } }>
+          <AttachMoneyIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Earn") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Earn performs profit switching for lending providers, moving your funds between dydx, Aave, Compound autonomously." }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'zap') } }>
+          <FlashOnIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Zap") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Zaps help you save on gas fees. Zap directly into or out of Curve pools from the base assets." }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { window.open("https://yinsure.finance", "_blank") } }>
           <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>{ "Protekt Pools" }</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get coverage on any DeFi protocol. Pay in a small percentage of yield farming rewards." }</Typography>
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get cover with Nexus Mutual from yinsure.finance" }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'stats') } }>
+          <BarChartIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>Stats</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get a quick glance at how yearn's vaults are performing." }</Typography>
         </Card>
       </div>
     )

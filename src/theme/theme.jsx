@@ -30,6 +30,7 @@ export const colors = {
   orange: 'orange',
   pink: '#DC6BE5',
   compoundGreen: '#00d395',
+  protektGreen: '#19E7C2',
   tomato: '#e56b73',
   purple: '#935dff',
 
@@ -37,7 +38,7 @@ export const colors = {
   lightBlue: "#2F80ED",
   topaz: "#0b8f92",
   darkGray: "rgba(43,57,84,.5)",
-  borderBlue: 'rgba(25, 101, 233, 0.5)'
+  borderBlue: 'rgba(25, 231, 194, 1)'
 };
 
 const breakpoints = createBreakpoints({
