@@ -6,6 +6,7 @@ import {
   Route
 } from "react-router-dom";
 import IpfsRouter from 'ipfs-react-router'
+import HttpsRedirect from 'react-https-redirect'
 
 import './i18n';
 import interestTheme from './theme';
@@ -62,53 +63,55 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
         <CssBaseline />
-        <IpfsRouter>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100vh',
-            alignItems: 'center',
-            background: "#f9fafb"
-          }}>
-            <Switch>
-              <Route path="/stats">
-                <Header />
-                <APR />
-              </Route>
-              <Route path="/earn">
-                <Header />
-                <InvestSimple />
-              </Route>
-              <Route path="/zap">
-                <Header />
-                <Zap />
-              </Route>
-              <Route path="/idai">
-                <IDai />
-              </Route>
-              <Route path="/performance">
-                <Header />
-                <Performance />
-              </Route>
-              <Route path="/manage">
-                <Header />
-                <Manage />
-              </Route>
-              <Route path="/pools">
-                <Header />
-                <Vaults />
-              </Route>
-              <Route path='/dashboard'>
-                <Header />
-                <Dashboard />
-              </Route>
-              <Route path="/">
-                <Home />
-              </Route>
-            </Switch>
-            <Footer />
-          </div>
-        </IpfsRouter>
+        <HttpsRedirect>
+          <IpfsRouter>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+              alignItems: 'center',
+              background: "#f9fafb"
+            }}>
+              <Switch>
+                <Route path="/stats">
+                  <Header />
+                  <APR />
+                </Route>
+                <Route path="/earn">
+                  <Header />
+                  <InvestSimple />
+                </Route>
+                <Route path="/zap">
+                  <Header />
+                  <Zap />
+                </Route>
+                <Route path="/idai">
+                  <IDai />
+                </Route>
+                <Route path="/performance">
+                  <Header />
+                  <Performance />
+                </Route>
+                <Route path="/manage">
+                  <Header />
+                  <Manage />
+                </Route>
+                <Route path="/pools">
+                  <Header />
+                  <Vaults />
+                </Route>
+                <Route path='/dashboard'>
+                  <Header />
+                  <Dashboard />
+                </Route>
+                <Route path="/">
+                  <Home />
+                </Route>
+              </Switch>
+              <Footer />
+            </div>
+          </IpfsRouter>
+        </HttpsRedirect>
       </MuiThemeProvider>
     );
   }
