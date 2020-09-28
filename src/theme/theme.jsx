@@ -38,7 +38,8 @@ export const colors = {
   lightBlue: "#2F80ED",
   topaz: "#0b8f92",
   darkGray: "rgba(43,57,84,.5)",
-  borderBlue: 'rgba(25, 231, 194, 1)'
+  borderBlue: 'rgba(25, 231, 194, 1)',
+  borderProtekt: 'rgba(25, 231, 194, 1)'
 };
 
 const breakpoints = createBreakpoints({
@@ -55,10 +56,10 @@ const breakpoints = createBreakpoints({
 const iswapTheme =  {
   typography: {
     fontFamily: [
+      'Roboto',
       '"Work Sans Thin"',
       'BlinkMacSystemFont',
       '"Segoe UI"',
-      'Roboto',
       '"Helvetica Neue"',
       'Arial',
       'sans-serif',
@@ -118,7 +119,7 @@ const iswapTheme =  {
   overrides: {
     MuiCssBaseline: {
       '@global': {
-        '@font-face': [WorkSans],
+        '@font-face': 'Roboto',
       },
     },
     MuiSelect: {
@@ -224,7 +225,7 @@ const iswapTheme =  {
     },
     MuiAccordion: {
       root: {
-        border: '1px solid '+colors.borderBlue,
+        border: '1px solid '+colors.borderProtekt,
         borderRadius: '50px',
         margin: '8px 0px',
         '&:before': { //underline color when textfield is inactive
@@ -286,7 +287,7 @@ const iswapTheme =  {
     },
     MuiToggleButtonGroup: {
       root: {
-        border: '1px solid '+colors.borderBlue,
+        border: '1px solid '+colors.borderProtekt,
         borderRadius: '50px',
       },
       groupedSizeSmall: {
@@ -306,10 +307,10 @@ const iswapTheme =  {
   },
   palette: {
     primary: {
-      main: colors.blue
+      main: colors.protektGreen
     },
     secondary: {
-      main: colors.topaz
+      main: colors.blue
     },
     text: {
       primary: colors.text,

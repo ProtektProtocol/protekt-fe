@@ -312,68 +312,12 @@ class Dashboard extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer}>
-          <div className={ classes.portfolioContainer }>
-            <div className={ classes.titleBalance } onClick={ this.balanceClicked }>
-              { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_balance_usd.toFixed(2)).toLocaleString() }</Typography> }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_balance_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                </div>
-              }
-              <Typography variant={ 'h4' } className={ classes.gray }>Portfolio Balance</Typography>
-            </div>
-            <div className={ classes.between }>
-            </div>
-            { growth === 0 &&
-              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
-                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_daily.toFixed(2)).toLocaleString() }</Typography> }
-                { currency === 'ETH' &&
-                  <div className={ classes.inline }>
-                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_daily.toFixed(2)).toLocaleString() }</Typography >
-                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                  </div>
-                }
-                <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
-                  Daily Growth
-                </Typography>
-              </div>
-            }
 
-            { growth === 1 &&
-              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
-                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_weekly.toFixed(2)).toLocaleString() }</Typography> }
-                { currency === 'ETH' &&
-                  <div className={ classes.inline }>
-                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_weekly.toFixed(2)).toLocaleString() }</Typography >
-                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                  </div>
-                }
-                <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
-                  Weekly Growth
-                </Typography>
-              </div>
-            }
-
-            { growth === 2 &&
-              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
-                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_yearly.toFixed(2)).toLocaleString() }</Typography> }
-                { currency === 'ETH' &&
-                  <div className={ classes.inline }>
-                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_yearly.toFixed(2)).toLocaleString() }</Typography >
-                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                  </div>
-                }
-                <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
-                  Yearly Growth
-                </Typography>
-              </div>
-            }
+          <div className={ classes.investedContainer2}>
+            <ReactMarkdown source={markdown} />
           </div>
 
 
-
-          { this.renderBasedOn() }
           { (dashboard.vaults && dashboard.vaults.length > 0) &&
             <div className={ classes.vaultContainer }>
               <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>

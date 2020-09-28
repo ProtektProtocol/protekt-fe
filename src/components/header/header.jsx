@@ -195,8 +195,8 @@ class Header extends Component {
             <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>Protekt Protocol</Typography>
           </div>
           <div className={ classes.links }>
-            { this.renderLink('dashboard') }
-            { this.renderLink('pools') }
+            { this.renderLinkName('dashboard', 'Home') }
+            { this.renderLinkName('pools', 'Protekt pools') }
           </div>
           <div className={ classes.account }>
             { address &&
@@ -225,6 +225,18 @@ class Header extends Component {
     return (
       <div className={ (window.location.pathname==='/'+screen)?classes.linkActive:classes.link } onClick={ () => { this.nav(screen) } }>
         <Typography variant={'h4'} className={ `title` }>{ screen }</Typography>
+      </div>
+    )
+  }
+
+  renderLinkName = (screen, name) => {
+    const {
+      classes
+    } = this.props;
+
+    return (
+      <div className={ (window.location.pathname==='/'+screen)?classes.linkActive:classes.link } onClick={ () => { this.nav(screen) } }>
+        <Typography variant={'h4'} className={ `title` }>{ name }</Typography>
       </div>
     )
   }
