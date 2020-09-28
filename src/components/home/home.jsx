@@ -213,15 +213,15 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('dashboard') } }>
-          <BarChartIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>Dashboard</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "See general information about Protekt Protocol and what you currently have covered."}</Typography>
-        </Card>
         <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('pools') }}>
           <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>{ "Protekt Pools" }</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get coverage on any DeFi protocol. Pay in a small percentage of yield farming rewards." }</Typography>
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ "Get covered" }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get coverage on any capital in a DeFi protocol and pay with a small percentage of yield farming rewards." }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('dashboard') } }>
+          <BarChartIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>Shield Mining</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Earn rewards by depositing capital to take on the liabitlity of any smart contract."}</Typography>
         </Card>
       </div>
     )
