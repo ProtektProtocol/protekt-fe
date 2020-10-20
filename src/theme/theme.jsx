@@ -109,7 +109,7 @@ const iswapTheme =  {
       MozOsxFontSmoothing: "grayscale",
     },
     body2: {
-      fontSize: '16px',
+      fontSize: '14px',
       fontWeight: '300',
       WebkitFontSmoothing: "antialiased",
       MozOsxFontSmoothing: "grayscale",

@@ -195,9 +195,10 @@ class Header extends Component {
             <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>Protekt Protocol</Typography>
           </div>
           <div className={ classes.links }>
-            { this.renderLinkName('dashboard', 'Get Covered') }
-            { this.renderLinkName('pools', 'Shield Mining') }
-            { this.renderLinkName('dashboard', 'How it works') }
+            { this.renderLinkName('get-protected', 'Get Protected') }
+            { this.renderLinkName('markets', 'All Markets') }
+            { this.renderLinkName('dashboard', 'My Holdings') }
+            { this.renderLinkName('how-it-works', 'How it works') }
           </div>
           <div className={ classes.account }>
             { address &&

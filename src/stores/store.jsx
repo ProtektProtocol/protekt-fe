@@ -77,6 +77,47 @@ class Store {
   constructor() {
 
     this.store = {
+      protektContracts: [
+        {
+          id: 'Compound-DAI',
+          name: 'Compound DAI',
+          symbol: 'cDAI',
+          underlyingTokenSymbol: 'cDAI',
+          reserveTokenSymbol: 'WETH',
+          description: 'cDAI',
+          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
+          mainLeftTopValue: '20% COMP',
+          mainLeftBottomLabel: 'FOR',
+          mainLeftBottomValue: '100% Coverage',
+          mainRightTopLabel: 'BACKED BY',
+          mainRightTopValue: 'ETH (Not invested)',
+          mainRightBottomLabel: 'GOVERNED BY',
+          mainRightBottomValue: 'DAO',
+          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          bodyCost: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
+          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          bodyShieldApy: `1.40%`,
+          bodyAmountStaked: `1,000 ETH ($200k)`,
+          bodyInvestmentStrategy: `Hodling (0% APY)`,
+          depositsDisabled: false,
+
+
+          vaultSymbol: 'pcDAI',
+          erc20address: 'Ethereum',
+          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          price_id: 'ethereum',
+        }
+      ],
       statistics: [],
       universalGasPrice: '70',
       ethPrice: 0,

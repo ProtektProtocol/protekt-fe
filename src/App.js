@@ -3,7 +3,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
   Switch,
-  Route
+  Route,
+  Redirect
 } from "react-router-dom";
 import IpfsRouter from 'ipfs-react-router'
 import HttpsRedirect from 'react-https-redirect'
@@ -21,7 +22,9 @@ import Footer from './components/footer';
 import Home from './components/home';
 import Header from './components/header';
 import Vaults from './components/vault';
+import AllContracts from './components/allContracts';
 import Dashboard from './components/dashboard';
+import HowItWorks from './components/howItWorks';
 
 import { injected } from "./stores/connectors";
 
@@ -73,37 +76,24 @@ class App extends Component {
               background: "#f9fafb"
             }}>
               <Switch>
-                <Route path="/stats">
-                  <Header />
-                  <APR />
-                </Route>
-                <Route path="/earn">
-                  <Header />
-                  <InvestSimple />
-                </Route>
-                <Route path="/zap">
-                  <Header />
-                  <Zap />
-                </Route>
-                <Route path="/idai">
-                  <IDai />
-                </Route>
-                <Route path="/performance">
-                  <Header />
-                  <Performance />
-                </Route>
+  
                 <Route path="/manage">
                   <Header />
                   <Manage />
                 </Route>
-                <Route path="/pools">
+                <Route path="/get-protected">
                   <Header />
-                  <Vaults />
+                  <AllContracts />
+                </Route>
+                <Route path="/markets">
+                  <Header />
+                  <AllContracts />
                 </Route>
                 <Route path='/dashboard'>
                   <Header />
                   <Dashboard />
                 </Route>
+                <Route exact path="/how-it-works" render={() => (window.location = "https://github.com/corbinpage/protekt-protocol-docs")} />
                 <Route path="/">
                   <Home />
                 </Route>
