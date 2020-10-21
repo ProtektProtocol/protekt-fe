@@ -249,7 +249,7 @@ const styles = theme => ({
   filters: {
     width: '100%',
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     [theme.breakpoints.down('sm')]: {
       padding: '0px 12px'
@@ -261,6 +261,8 @@ const styles = theme => ({
     borderRadius: '50px'
   },
   checkbox: {
+    display: 'flex',
+    flexDirection: 'row-reverse',
     flex: 1,
     margin: '0px !important'
   },
@@ -433,7 +435,7 @@ class Vault extends Component {
                 target="_blank"
                 href="https://airtable.com/shra7rmIpLE83v8dM"
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color={'black'}>Add Market</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'} color={'black'}>Add new Protekt Contract</Typography>
               </Button>
             </div>
           </div>
@@ -494,16 +496,16 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    src={ require('../../assets/'+asset.symbol+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ 'DAI' }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingToken }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ 'Compound' }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingSmartContract }</Typography>
                 </div>
               </div>
               <div className={classes.headingEarning}>

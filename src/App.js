@@ -76,27 +76,12 @@ class App extends Component {
               background: "#f9fafb"
             }}>
               <Switch>
-  
-                <Route path="/manage">
-                  <Header />
-                  <Manage />
-                </Route>
-                <Route path="/get-protected">
-                  <Header />
-                  <AllContracts />
-                </Route>
-                <Route path="/markets">
-                  <Header />
-                  <AllContracts />
-                </Route>
-                <Route path='/dashboard'>
-                  <Header />
-                  <Dashboard />
-                </Route>
                 <Route exact path="/how-it-works" render={() => (window.location = "https://github.com/corbinpage/protekt-protocol-docs")} />
-                <Route path="/">
-                  <Home />
+                <Route path="/contracts">
+                  <Header />
+                  <AllContracts />
                 </Route>
+                <Redirect to="/contracts" />
               </Switch>
               <Footer />
             </div>

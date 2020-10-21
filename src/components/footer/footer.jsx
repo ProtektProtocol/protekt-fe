@@ -131,7 +131,7 @@ class Footer extends Component {
             <img alt="" src={ require('../../assets/twitter.svg') } height='24px' className={ classes.icon } />
             <Typography variant={ 'h4'} >Twitter</Typography>
           </div>
-          <div  className={ classes.link } onClick={()=> window.open("https://github.com/corbinpage/protekt-protocol", "_blank")} >
+          <div  className={ classes.link } onClick={()=> window.open("https://github.com/corbinpage/protekt-protocol-docs", "_blank")} >
             <img alt="" src={ require('../../assets/github.svg') } height='24px' className={ classes.icon } />
             <Typography variant={ 'h4'} >Github</Typography>
           </div>
