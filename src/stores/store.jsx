@@ -88,7 +88,7 @@ class Store {
           reserveTokenSymbol: 'WETH',
           description: 'cDAI',
           mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-          mainLeftTopValue: '10-20% COMP',
+          mainLeftTopValue: ' 20% COMP',
           mainLeftBottomLabel: 'FOR',
           mainLeftBottomValue: '100% Coverage',
           mainRightTopLabel: 'BACKED BY',
@@ -102,10 +102,11 @@ class Store {
           bodyAmountStaked: `1,000 ETH ($200k)`,
           bodyInvestmentStrategy: `Hodling (0% APY)`,
           depositsDisabled: false,
-
           vaultSymbol: 'pcDAI',
-          erc20address: 'Ethereum',
-          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          erc20address: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          // -----
+          vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          // -----
           vaultContractABI: config.vaultContractV4ABI,
           balance: 0,
           vaultBalance: 0,
@@ -198,6 +199,92 @@ class Store {
           measurement: 1e18,
           price_id: 'ethereum',
         },
+      ],
+      coverageHoldings: [
+        {
+          id: 'Compound-DAI-1',
+          name: 'Compound DAI',
+          symbol: 'cDAI-logo',
+          underlyingToken: 'DAI',
+          underlyingSmartContract: 'Compound',
+          underlyingTokenSymbol: 'cDAI',
+          reserveTokenSymbol: 'WETH',
+          description: 'cDAI',
+          mainLeftTopLabel: 'AMOUNT COVERED',
+          mainLeftTopValue: '$10k (10k DAI)',
+          mainLeftBottomLabel: 'COVERAGE',
+          mainLeftBottomValue: '100%',
+          mainRightTopLabel: 'FEES',
+          mainRightTopValue: '20% COMP',
+          mainRightBottomLabel: 'BACKED BY',
+          mainRightBottomValue: 'ETH (Not invested)',
+          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          bodyCost: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
+          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          bodyShieldApy: `1.40%`,
+          bodyAmountStaked: `1,000 ETH ($200k)`,
+          bodyInvestmentStrategy: `Hodling (0% APY)`,
+          depositsDisabled: false,
+          vaultSymbol: 'pcDAI',
+          erc20address: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          // -----
+          vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          // -----
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          price_id: 'ethereum',
+        }
+      ],
+      stakingHoldings: [
+        {
+          id: 'Compound-DAI',
+          name: 'Compound DAI',
+          symbol: 'cDAI-logo',
+          underlyingToken: 'DAI',
+          underlyingSmartContract: 'Compound',
+          underlyingTokenSymbol: 'cDAI',
+          reserveTokenSymbol: 'WETH',
+          description: 'cDAI',
+          mainLeftTopLabel: 'AMOUNT STAKED',
+          mainLeftTopValue: '$10k (10k DAI)',
+          mainLeftBottomLabel: 'APY',
+          mainLeftBottomValue: '1.40%',
+          mainRightTopLabel: 'AMOUNT STAKED',
+          mainRightTopValue: '$100k (25k ETH)',
+          mainRightBottomLabel: 'INVESTMENT STRATEGY',
+          mainRightBottomValue: 'Hodling (0% APY)',
+          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          bodyCost: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
+          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          bodyShieldApy: `1.40%`,
+          bodyAmountStaked: `1,000 ETH ($200k)`,
+          bodyInvestmentStrategy: `Hodling (0% APY)`,
+          depositsDisabled: false,
+          vaultSymbol: 'pcDAI',
+          erc20address: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          // -----
+          vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          // -----
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          price_id: 'ethereum',
+        }
       ],
       statistics: [],
       universalGasPrice: '70',
@@ -3295,7 +3382,7 @@ class Store {
     emitter.on(USD_PRICE_RETURNED, this._calculateDashboard)
     emitter.on(STATISTICS_RETURNED, this._calculateDashboard)
 
-    this.getVaultBalancesFull()
+    // this.getVaultBalancesFull()
     this.getBalancesLight()
     this.getUSDPrices()
     this.getStatistics()
