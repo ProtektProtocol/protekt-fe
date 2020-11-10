@@ -298,6 +298,11 @@ const styles = theme => ({
   }
 });
 
+/*
+    Clear up confusion of asset / assets / ProtektContracts
+
+*/
+
 class Vault extends Component {
 
   constructor(props) {
@@ -352,6 +357,7 @@ class Vault extends Component {
       assets: store.getStore('vaultAssets') ,
       loading: false
     })
+    .then(console.log(this.state.assets))
   };
 
   connectionConnected = () => {
@@ -365,7 +371,7 @@ class Vault extends Component {
 
     dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
 
-    const that = this
+    const that = this 
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
       that.setState(snackbarObj)
@@ -402,6 +408,7 @@ class Vault extends Component {
   };
 
   render() {
+    
     const { classes } = this.props;
     const {
       loading,
@@ -467,25 +474,55 @@ class Vault extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    return protektContracts.filter((asset) => {
-      if(hideZero && (asset.balance === 0 && asset.vaultBalance === 0)) {
+    console.log('\n \n \n Inside protekt block')
+    console.log('ASSETS:')
+    console.log(assets)
+    console.log('pContracts:')
+    console.log(protektContracts)
+    return protektContracts.filter((pContract) => {
+
+      if(hideZero && (pContract.balance === 0 && pContract.vaultBalance === 0)) {
         return false
       }
 
       if(search && search !== '') {
-        return asset.id.toLowerCase().includes(search.toLowerCase()) ||
-              asset.name.toLowerCase().includes(search.toLowerCase()) ||
-              asset.symbol.toLowerCase().includes(search.toLowerCase()) ||
-              asset.description.toLowerCase().includes(search.toLowerCase()) ||
-              asset.vaultSymbol.toLowerCase().includes(search.toLowerCase())
+        return  pContract.id.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.name.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.symbol.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.description.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.vaultSymbol.toLowerCase().includes(search.toLowerCase())
               // asset.erc20address.toLowerCase().includes(search.toLowerCase()) ||
               // asset.vaultContractAddress.toLowerCase().includes(search.toLowerCase())
       } else {
         return true
       }
-    }).map((asset) => {
+    }).map((pContract) => {
+      
+
+      /*
+          Clean everything below up it's disgusting
+            - should it be called here or inside the contract from the vault?
+            - Makes no sense to get assets ((your own crypto)) from store here if not using it here and passing it down
+              - However the point of the flux emitter is to let us do things like that so not 100% sure.
+      */
+      const reserveTokenSymbol = pContract.reserveTokenSymbol
+      const underlyingTokenSymbol = pContract.underlyingTokenSymbol
+      var reserveTokenBalance = ""
+      var underlyingTokenBalance = ""
+
+      // assumes underlying and reserve can't be the same - change this 
+      for (var index in assets){
+        let currentAsset  = assets[index]
+        if(currentAsset.id === reserveTokenSymbol){
+           reserveTokenBalance =  currentAsset.balance
+        }
+        if(currentAsset.id === underlyingTokenSymbol){
+          underlyingTokenBalance =  currentAsset.balance
+        }
+      }
+      
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Accordion className={ classes.expansionPanel } square key={ pContract.id+"_expand" } expanded={ expanded === pContract.id} onChange={ () => { this.handleChange(pContract.id) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -496,36 +533,36 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'.png') }
+                    src={ require('../../assets/'+pContract.symbol+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                    style={pContract.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingToken }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ pContract.underlyingToken }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingSmartContract }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ pContract.underlyingSmartContract }</Typography>
                 </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainLeftTopLabel }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.mainLeftTopValue }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainLeftBottomLabel }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.mainLeftBottomValue }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainRightTopLabel }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.mainRightTopValue }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainRightBottomLabel }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.mainRightBottomValue }</Typography>
               </div>
             </div>
           </AccordionSummary>
           <AccordionDetails className={ classes.removePadding }>
-            <PContract asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
+            <PContract reserveTokenBalance={reserveTokenBalance} underlyingTokenBalance={underlyingTokenBalance} asset={ pContract } startLoading={ this.startLoading } basedOn={ basedOn } />
           </AccordionDetails>
         </Accordion>
       )

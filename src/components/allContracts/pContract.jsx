@@ -17,12 +17,14 @@ import {
   DEPOSIT_ALL_VAULT,
   DEPOSIT_ALL_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT,
-  WITHDRAW_ALL_VAULT_RETURNED
+  WITHDRAW_ALL_VAULT_RETURNED,
+  START_PROTECTION
 } from '../../constants'
 
 import { colors } from '../../theme'
 
 import Store from "../../stores";
+import { NoEthereumProviderError } from "@web3-react/injected-connector";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -185,7 +187,11 @@ const styles = theme => ({
     width: '83px'
   }
 });
+/*
 
+    Asset here represents a ProtektContract not an asset
+
+*/
 
 class Asset extends Component {
 
@@ -197,7 +203,7 @@ class Asset extends Component {
       amountError: false,
       redeemAmount: '',
       redeemAmountError: false,
-      account: store.getStore('account'),
+      account: store.getStore('account'), 
     }
   }
 
@@ -230,7 +236,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, asset } = this.props;
+    const { classes, asset, underlyingTokenBalance, reserveTokenBalance } = this.props;
     const {
       amount,
       amountError,
@@ -267,7 +273,7 @@ class Asset extends Component {
             { !asset.depositDisabled &&
               <div>
                 <div className={ classes.balances }>
-                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.underlyingTokenSymbol }</Typography>
+                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (underlyingTokenBalance ? (Math.floor(underlyingTokenBalance*100000)/100000).toFixed(4) : '0.0000') } { asset.underlyingTokenSymbol }</Typography>
                 </div>
                 <TextField
                   fullWidth
@@ -285,8 +291,8 @@ class Asset extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
-                  onClick={ this.onDeposit }
+                  disabled={ loading || underlyingTokenBalance <= 0 || asset.depositDisabled === true }
+                  onClick={ () => this.onDeposit('SEEKER') }
                   fullWidth
                   >
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Start protection</Typography>
@@ -331,7 +337,7 @@ class Asset extends Component {
             { !asset.depositDisabled &&
               <div>
                 <div className={ classes.balances }>
-                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
+                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (reserveTokenBalance ? (Math.floor(reserveTokenBalance*100000)/100000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
                 </div>
                 <TextField
                   fullWidth
@@ -349,8 +355,8 @@ class Asset extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
-                  onClick={ this.onDeposit }
+                  disabled={ loading || reserveTokenBalance <= 0 || asset.depositDisabled === true }
+                  onClick={ () => this.onDeposit('MINER') }
                   fullWidth
                   >
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit to shield mine</Typography>
@@ -405,13 +411,74 @@ class Asset extends Component {
     }
   }
 
-  onDeposit = () => {
+  /*
+    Users should only be able to deposit positive amounts less than their current balance.
+    Users will likely need to approve the smart contract to send the amount before depositing.
+  // */
+
+  onDeposit = (user) => {
+    console.log(`\n \n \n \n  DEPOSIT PRESSED FOR ${user}  \n \n \n`)
+    this.setState({ amountError: false })
+    const { amount } = this.state
+    const { asset, startLoading } = this.props
+    
+    var transactionTokenBalance = null
+    var transactionToken = null
+
+    if(user === "SEEKER"){
+      transactionTokenBalance = this.underlyingTokenBalance
+    }
+    if(user === "MINER"){
+      transactionTokenBalance = this.reserveTokenBalance
+    }
+    console.log('amount to deposit :' + amount)
+    
+    if(!amount || isNaN(amount) || amount <= 0 || amount > transactionTokenBalance) {
+      this.setState({ amountError: true })
+      return false
+    }
+
+    console.log('passed amount test')
+    this.setState({ loading: true })
+    startLoading()
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset, user: user } })
+  }
+
+  onStartProtection = () => {
+    console.log('\n \n \n \n  START PROTECTION PRESSED  \n \n \n')
     this.setState({ amountError: false })
 
     const { amount } = this.state
     const { asset, startLoading } = this.props
 
-    if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
+    console.log('amount to deposit :' + amount)
+
+    // need to change this based on which deposit type it is
+    if(!amount || isNaN(amount) || amount <= 0 || amount > this.underlyingTokenBalance) {
+      this.setState({ amountError: true })
+      console.log(`hit err as ${amount} > ${this.underlyingTokenBalance}`)
+      return false
+    }
+
+    console.log('passed error check on protection')
+
+    this.setState({ loading: true })
+    startLoading()
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
+  }
+
+
+  onDepositToShieldMine = () => {
+    console.log('\n \n \n \n  DEPOSIT PRESSED  \n \n \n')
+    this.setState({ amountError: false })
+
+    const { amount } = this.state
+    const { asset, startLoading } = this.props
+
+    console.log('amount to deposit :' + amount)
+
+           // need to change this based on which deposit type it is
+    if(!amount || isNaN(amount) || amount <= 0 || amount > this.reserveTokenBalance) {
       this.setState({ amountError: true })
       return false
     }

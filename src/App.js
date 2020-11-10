@@ -28,7 +28,8 @@ import HowItWorks from './components/howItWorks';
 
 import { injected } from "./stores/connectors";
 
-import {
+
+import { 
   CONNECTION_CONNECTED,
 } from './constants'
 
@@ -43,7 +44,7 @@ class App extends Component {
     injected.isAuthorized().then(isAuthorized => {
       if (isAuthorized) {
         injected.activate()
-        .then((a) => {
+        .then((a) => {  
           store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
           emitter.emit(CONNECTION_CONNECTED)
         })
@@ -55,10 +56,13 @@ class App extends Component {
       }
     });
 
-    window.ethereum.on('accountsChanged', function (accounts) {
-      store.setStore({ account: { address: accounts[0] } })
-      emitter.emit(CONNECTION_CONNECTED)
-    })
+    // check window.ethereum is defined
+    if(window.ethereum){
+      window.ethereum.on('accountsChanged', function (accounts) {
+        store.setStore({ account: { address: accounts[0] } })
+        emitter.emit(CONNECTION_CONNECTED)
+      })
+    }
 
   }
 

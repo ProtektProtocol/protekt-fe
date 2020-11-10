@@ -47,6 +47,7 @@ import {
   USD_PRICE_RETURNED,
   GET_STATISTICS,
   STATISTICS_RETURNED,
+  START_PROTECTION
 } from '../constants';
 import Web3 from 'web3';
 
@@ -100,6 +101,86 @@ class Store {
           bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
           bodyShieldApy: `1.40%`,
           bodyAmountStaked: `1,000 ETH ($200k)`,
+          bodyInvestmentStrategy: `Hodling (0% APY)`,
+          depositsDisabled: false,
+
+          vaultSymbol: 'pcDAI',
+          erc20address: 'Ethereum',
+          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          price_id: 'ethereum',
+        },
+        {
+          id: 'Compound-TEST',
+          name: 'Compound TEST',
+          symbol: 'cDAI-logo',
+          underlyingToken: 'TESTU',
+          underlyingSmartContract: 'TEST',
+          underlyingTokenSymbol: 'TESTU',
+          reserveTokenSymbol: 'TESTR',
+          description: 'TESTU',
+          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
+          mainLeftTopValue: '10-20% TEST',
+          mainLeftBottomLabel: 'FOR',
+          mainLeftBottomValue: '100% Coverage',
+          mainRightTopLabel: 'BACKED BY',
+          mainRightTopValue: 'ETH (Not invested)',
+          mainRightBottomLabel: 'GOVERNED BY',
+          mainRightBottomValue: 'TEST',
+          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          bodyCost: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
+          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          bodyShieldApy: `1.40%`,
+          bodyAmountStaked: `1,000 ETH ($200k)`,
+          bodyInvestmentStrategy: `Hodling (0% APY)`,
+          depositsDisabled: false,
+
+          vaultSymbol: 'pTest',
+          erc20address: '0x7baCdF93AC5f58fEB8283Dd96E26710F4c7E1F40', // underlying - when I change this to reserve - it still sends testu and returns tes pTESTu - figure out WHY and problem is solved.
+          vaultContractAddress: '0x3b5419c9581d2cc565F029aE0c84C4C807EB8171', // pToken
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          price_id: 'ethereum',
+        },
+        {
+          id: 'Uniswap-WETH',
+          name: 'Uniswap WETH',
+          symbol: 'uniswap',
+          underlyingToken: 'WETH',
+          underlyingSmartContract: 'Uniswap',
+          underlyingTokenSymbol: 'UNI V2 ETH-WETH',
+          reserveTokenSymbol: 'WETH',
+          description: 'UNI V2 ETH-WETH',
+          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
+          mainLeftTopValue: '20% UNI',
+          mainLeftBottomLabel: 'FOR',
+          mainLeftBottomValue: '100% Coverage',
+          mainRightTopLabel: 'BACKED BY',
+          mainRightTopValue: 'ETH (Not invested)',
+          mainRightBottomLabel: 'GOVERNED BY',
+          mainRightBottomValue: 'DAO',
+          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
+          bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
+          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          bodyShieldApy: `2.70%`,
+          bodyAmountStaked: `1,200 ETH ($200k)`,
           bodyInvestmentStrategy: `Hodling (0% APY)`,
           depositsDisabled: false,
 
@@ -466,7 +547,10 @@ class Store {
             break;
           case GET_STATISTICS:
             this.getStatistics(payload)
-            break
+            break;
+            case START_PROTECTION:
+              this.startProtection(payload)
+              break
           default: {
           }
         }
@@ -480,7 +564,6 @@ class Store {
 
   setStore(obj) {
     this.store = {...this.store, ...obj}
-    // console.log(this.store)
     return emitter.emit('StoreUpdated');
   };
 
@@ -927,6 +1010,48 @@ class Store {
           idai: true,
           price_id: 'dai',
         },
+        {
+          id: 'TESTR',
+          name: 'TESTR',
+          symbol: 'TESTR', 
+          description: 'Test Reserve',
+          vaultSymbol: 'TESTR',
+          erc20address: '0x7baCdF93AC5f58fEB8283Dd96E26710F4c7E1F40',
+          vaultContractAddress: '0x3b5419c9581d2cc565F029aE0c84C4C807EB8171', // shToken
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          depositDisabled: false,
+          lastMeasurement: 10604016,
+          measurement: 1e18,
+          price_id: 'testr',
+        },
+        {
+          id: 'TESTU',
+          name: 'TESTU',
+          symbol: 'TESTU', 
+          description: 'Test Underlying',
+          vaultSymbol: 'TESTU',
+          erc20address: '0x4162F62BAf5cEd4C6cbECe7e547d2aAa89949D4f',
+          vaultContractAddress: '0x35fDF71b4Ec48500FC3c9E617c8960154f6014EB', // pToken
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          depositDisabled: false,
+          lastMeasurement: 10604016,
+          measurement: 1e18,
+          price_id: 'testu',
+        }
       ],
       vaultAssets: [
         {
@@ -1174,6 +1299,48 @@ class Store {
           lastMeasurement: 10604016,
           measurement: 1e18,
           price_id: 'chainlink',
+        },
+        {
+          id: 'TESTR',
+          name: 'TESTR',
+          symbol: 'TESTR', 
+          description: 'Test Reserve',
+          vaultSymbol: 'TESTR',
+          erc20address: '0x7baCdF93AC5f58fEB8283Dd96E26710F4c7E1F40',
+          vaultContractAddress: '0x3b5419c9581d2cc565F029aE0c84C4C807EB8171', // shToken
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          depositDisabled: true,
+          lastMeasurement: 10604016,
+          measurement: 1e18,
+          price_id: 'testr',
+        },
+        {
+          id: 'TESTU',
+          name: 'TESTU',
+          symbol: 'TESTU', 
+          description: 'Test Underlying',
+          vaultSymbol: 'TESTU',
+          erc20address: '0x4162F62BAf5cEd4C6cbECe7e547d2aAa89949D4f',
+          vaultContractAddress: '0x35fDF71b4Ec48500FC3c9E617c8960154f6014EB', // pToken
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          depositDisabled: true,
+          lastMeasurement: 10604016,
+          measurement: 1e18,
+          price_id: 'testu',
         }
       ],
       aprs: [{
@@ -1388,8 +1555,13 @@ class Store {
     }
   }
 
-  _checkApproval = async (asset, account, amount, contract, callback) => {
+  /*
+      I don't actuially knwo what this is approving
 
+  */
+  _checkApproval = async (asset, account, amount, contract, callback) => {
+    console.log('\n \n \n checking approval for ASSET :')
+    console.log(asset)
     if(asset.erc20address === 'Ethereum') {
       return callback()
     }
@@ -1719,6 +1891,8 @@ class Store {
 
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
+    
+
     async.map(assets, (asset, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
@@ -1740,7 +1914,7 @@ class Store {
         asset.current = data[6]
         asset.recommended = data[7]
         asset.tokenBalance = data[8]
-
+        console.log('BALANCE FOR ASSET : ' + data[0])
         callback(null, asset)
       })
     }, (err, assets) => {
@@ -1754,10 +1928,11 @@ class Store {
   }
 
   _getERC20Balance = async (web3, asset, account, callback) => {
-
+    console.log('getting erc20 balance for : ' + asset.id + ' ERC20ADDRESS : ' + asset.erc20address)
     if(asset.erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
+        console.log('BALANCE FOUND : ' + eth_balance + ' for eth')
         callback(null, parseFloat(eth_balance))
       } catch(ex) {
         console.log(ex)
@@ -1769,9 +1944,11 @@ class Store {
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
         balance = parseFloat(balance)/10**asset.decimals
-        callback(null, parseFloat(balance))
+        // console.log('BALANCE FOUND : ' + balance + ' for ' + asset.id)
+        return callback(null, parseFloat(balance))
       } catch(ex) {
-        console.log(ex)
+        // console.log(ex)
+        // console.log(`\n \n \n \n ********* HIT ERROR OF ERC20 WITH ASSET ${asset.id} \n \n \n \n \n \n`)
         return callback(ex)
       }
     }
@@ -2559,60 +2736,86 @@ class Store {
     const account = store.getStore('account')
     const assets = store.getStore('vaultAssets')
 
+    // console.log('\n \n \n \n ********* GET BALANCES RUNNING \n \n \n \n \n \n')
+    
     if(!account || !account.address) {
       return false
     }
 
     const web3 = await this._getWeb3Provider()
+    // web3.eth.net.getId()
+    //   .then(console.log);
+
+    //   web3.eth.net.getNetworkType()
+    //   .then(console.log);
+    //
+
     if(!web3) {
       return null
     }
 
-    const vaultStatistics = await this._getStatistics()
-    const addressStatistics = await this._getAddressStatistics(account.address)
-    const addressTXHitory = await this._getAddressTxHistory(account.address)
+    // var MyContract = new web3.eth.Contract(config.vaultContractV2ABI, '0x4162F62BAf5cEd4C6cbECe7e547d2aAa89949D4f', {
+    //   from: '0x2E380738810a2CFF254944A2b4aA90Cc1F35e7B0', // default from address
+    //   gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
+    // });
 
-    const usdPrices = await this._getUSDPrices()
+    // MyContract.methods.balanceOf('0x2E380738810a2CFF254944A2b4aA90Cc1F35e7B0').call()
+    //   .then(function(result){
+    //   //the result holds your Token Balance that you can assign to a var
+    //   var myTokenBalance = result;
+    //   console.log('token balance :' + myTokenBalance)
+    //   return result;
+    // });
+
+    // const vaultStatistics = await this._getStatistics()
+    // const addressStatistics = await this._getAddressStatistics(account.address)
+    // const addressTXHitory = await this._getAddressTxHistory(account.address)
+
+    // const usdPrices = await this._getUSDPrices()
 
 
     async.map(assets, (asset, callback) => {
+      console.log('ASSET : ' + asset.id)
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getStrategy(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getStatsAPY(vaultStatistics, asset, callbackInner) },
-        (callbackInner) => { this._getVaultHoldings(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getAssetUSDPrices(web3, asset, account, usdPrices, callbackInner) },
-        (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getAddressStats(addressStatistics, asset, callbackInner) },
-        (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
+        // (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
+        // (callbackInner) => { this._getStrategy(web3, asset, account, callbackInner) },
+        // (callbackInner) => { this._getStatsAPY(vaultStatistics, asset, callbackInner) },
+        // (callbackInner) => { this._getVaultHoldings(web3, asset, account, callbackInner) },
+        // (callbackInner) => { this._getAssetUSDPrices(web3, asset, account, usdPrices, callbackInner) },
+        // (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) },
+        // (callbackInner) => { this._getAddressStats(addressStatistics, asset, callbackInner) },
+        // (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
       ], (err, data) => {
         if(err) {
+          // console.log('\n \n \n \n ********* HIT ERR OF ASSETS \n \n \n \n \n \n')
           return callback(err)
         }
-
         asset.balance = data[0]
-        asset.vaultBalance = data[1]
-        asset.strategy = data[2].strategy
-        asset.strategyHoldings = data[2].holdings
-        asset.strategyName = data[2].name
-        asset.stats = data[3]
-        asset.vaultHoldings = data[4]
-        asset.pricePerFullShare = data[5].pricePerFullShare
-        asset.usdPrice = data[5].usdPrice
-        asset.pricePerFullShare = data[6].pricePerFullShare
-        asset.apy = data[6].apy
-        asset.addressStatistics = data[7]
-        asset.addressTransactions = data[8]
+        // asset.vaultBalance = data[1]
+        // asset.strategy = data[2].strategy
+        // asset.strategyHoldings = data[2].holdings
+        // asset.strategyName = data[2].name
+        // asset.stats = data[3]
+        // asset.vaultHoldings = data[4]
+        // asset.pricePerFullShare = data[5].pricePerFullShare
+        // asset.usdPrice = data[5].usdPrice
+        // asset.pricePerFullShare = data[6].pricePerFullShare
+        // asset.apy = data[6].apy
+        // asset.addressStatistics = data[7]
+        // asset.addressTransactions = data[8]
 
         callback(null, asset)
       })
     }, (err, assets) => {
+      // console.log('\n \n \n \n ********* HIT end of async \n \n \n \n \n \n')
+      // console.log(assets)
       if(err) {
-        console.log(err)
+        // console.log('\n \n \n \n ********* HIT ERROR \n \n \n \n \n \n')
+        // console.log(err)
         return emitter.emit(ERROR, err)
       }
-
+      // console.log(assets)
       store.setStore({ vaultAssets: assets })
       return emitter.emit(VAULT_BALANCES_FULL_RETURNED, assets)
     })
@@ -2801,6 +3004,8 @@ class Store {
         asset.vaultBalance = data[1]
         asset.pricePerFullShare = data[2].pricePerFullShare
         asset.apy = data[2].apy
+        console.log('ASSET',asset)
+        console.log('BALANCE',data[0])
 
         callback(null, asset)
       })
@@ -2843,7 +3048,8 @@ class Store {
 
   depositVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount } = payload.content
+    const { asset, amount, user } = payload.content
+    console.log(`\n \n \n hit deposit for ${user}`)
 
     this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
       if(err) {
@@ -2859,6 +3065,31 @@ class Store {
       })
     })
   }
+
+  // startProtection = (payload) => {
+  //   const account = store.getStore('account')
+  //   const { asset, amount } = payload.content
+
+  //   console.log(`\n \n \n  hit start protection in store : asset = ${asset.id} amount = ${amount}  `)
+  //   console.log(asset)
+
+  //   this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
+  //     if(err) {
+  //       return emitter.emit(ERROR, err);
+  //     }
+  //     console.log('\n \n passed approval')
+  //     this._callDepositVault(asset, account, amount, (err, depositResult) => {
+  //       if(err) {
+  //         return emitter.emit(ERROR, err);
+  //       }
+  //       console.log('\n \n passed error on deposit')
+  //       console.log('deposit resul:')
+  //       console.log(depositResult)
+
+  //       return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
+  //     })
+  //   })
+  // }
 
   _checkIfApprovalIsNeeded = async (asset, account, amount, contract, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
@@ -2924,13 +3155,16 @@ class Store {
 
   _callDepositVault = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
-
+    console.log('\n \n \n  deposit vault hit')
+    console.log('asset is : ')
+    console.log(asset)
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
       amountToSend = amount*10**asset.decimals;
     }
+    console.log(`Sending ${amountToSend} of ${asset.erc20address} to ${asset.vaultContractAddress}`)
 
     if(asset.erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
