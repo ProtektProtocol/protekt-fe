@@ -493,31 +493,31 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'.png') }
+                    src={ require('../../assets/'+asset.logo+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingToken }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredTokenSymbol }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingSmartContract }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredPool }</Typography>
                 </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'COST' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.costSummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'FOR' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'BACKED BY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.strategySummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'MANAGED BY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.claimManagerSummaryDisplay }</Typography>
               </div>
             </div>
           </AccordionSummary>

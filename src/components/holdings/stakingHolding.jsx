@@ -59,7 +59,7 @@ const styles = theme => ({
       flexDirection: 'column'
     }
   },
-  shieldSection: {
+  rightSection: {
     width: '50%',
     overflow: 'auto',
     paddingBottom: '12px',
@@ -247,12 +247,12 @@ class Asset extends Component {
           </div>
 
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>COMP EARNED</Typography>
-            <Typography variant={ 'h4' }>{ '10 COMP' } </Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT EARNED</Typography>
+            <Typography variant={ 'h4' }>{ asset.claimableRewardAmountToken } </Typography>
           </div>
 
           <div className={ classes.transactionContainer }>
-            { !asset.depositDisabled &&
+            { !asset.claimableRewardsDisabled &&
               <div>
                 <Button
                   className={ classes.actionButton }
@@ -268,15 +268,15 @@ class Asset extends Component {
                 </Button>
               </div>
             }            
-            { asset.depositDisabled === true &&
+            { asset.claimableRewardsDisabled === true &&
               <div className={classes.disabledContainer}>
-                <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
+                <Typography variant='h4'>Claiming rewards are currently disabled.</Typography>
               </div>
             }
           </div>
 
         </div>
-        <div className={classes.shieldSection}>
+        <div className={classes.rightSection}>
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h3' }>Claims</Typography>
           </div>
@@ -284,14 +284,14 @@ class Asset extends Component {
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>STATUS</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ 'No Claim filed' } </Typography>
+              <Typography variant={ 'h4' }>{ 'No claim filed' } </Typography>
             </div>
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>PAYOUT EVENT STATUS</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ 'No Event found' } </Typography>
+              <Typography variant={ 'h4' }>{ 'No event found' } </Typography>
             </div>
           </div>
 

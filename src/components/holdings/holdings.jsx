@@ -308,6 +308,7 @@ class Vault extends Component {
 
     this.state = {
       assets: store.getStore('vaultAssets'),
+      protektContracts: store.getStore('protektContracts'),
       coverageHoldings: store.getStore('coverageHoldings'),
       stakingHoldings: store.getStore('stakingHoldings'),
       usdPrices: store.getStore('usdPrices'),
@@ -455,7 +456,7 @@ class Vault extends Component {
   };
 
   renderCoverageHoldings = () => {
-    const { coverageHoldings, assets, expanded, search, hideZero, basedOn } = this.state
+    const { coverageHoldings, protektContracts, assets, expanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
@@ -465,9 +466,11 @@ class Vault extends Component {
       )
     }
 
-    return coverageHoldings.map((asset) => {
+    return coverageHoldings.map((temp) => {
+      let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
+
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_cover_"+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -485,24 +488,24 @@ class Vault extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingToken }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredTokenSymbol }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingSmartContract }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredPool }</Typography>
                 </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'AMOUNT COVERED' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.amountCoveredToken }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'COVERAGE' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'FEES' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.costSummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'BACKED BY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.strategySummaryDisplay }</Typography>
               </div>
             </div>
           </AccordionSummary>
@@ -515,7 +518,7 @@ class Vault extends Component {
   }
 
   renderStakingHoldings = () => {
-    const { stakingHoldings, assets, expanded, search, hideZero, basedOn } = this.state
+    const { stakingHoldings, protektContracts, assets, expanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
@@ -525,9 +528,11 @@ class Vault extends Component {
       )
     }
 
-    return stakingHoldings.map((asset) => {
+    return stakingHoldings.map((temp) => {
+      let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
+
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_stake_"+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -545,24 +550,23 @@ class Vault extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingToken }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredTokenSymbol }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.underlyingSmartContract }</Typography>
-                </div>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredPool }</Typography>                </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'YOUR STAKED AMOUNT' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.amountStakedUsd }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainLeftBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainLeftBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL APY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.shieldNetApy }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL STAKED AMOUNT' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.shieldTotalAmountStakedUsd }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ asset.mainRightBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.mainRightBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'INVESTMENT STRATEGY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.strategyDisplay }</Typography>
               </div>
             </div>
           </AccordionSummary>

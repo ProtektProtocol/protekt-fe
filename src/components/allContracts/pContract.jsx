@@ -248,18 +248,18 @@ class Asset extends Component {
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>COST</Typography>
-            <ReactMarkdown source={asset.bodyCost} />
+            <ReactMarkdown source={asset.costDisplay} />
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>COVERAGE FOR</Typography>
-            <ReactMarkdown source={asset.bodyRisks} />
+            <ReactMarkdown source={asset.coverageDisplay} />
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>CLAIMS</Typography>
             <div className={ classes.flexy }>
-              <ReactMarkdown source={asset.bodyClaims} />
+              <ReactMarkdown source={asset.claimManagerDisplay} />
             </div>
           </div>
 
@@ -309,14 +309,14 @@ class Asset extends Component {
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>APY FROM FEES</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ asset.bodyShieldApy } </Typography>
+              <Typography variant={ 'h4' }>{ asset.shieldNetApy } </Typography>
             </div>
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT STAKED</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ asset.bodyAmountStaked } </Typography>
+              <Typography variant={ 'h4' }>{ asset.shieldTotalAmountStakedUsd } </Typography>
             </div>
           </div>
 
