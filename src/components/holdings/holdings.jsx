@@ -21,8 +21,8 @@ import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 
 import Snackbar from '../snackbar'
-import Asset from './asset'
-import PContract from './pContract'
+import CoverageHolding from './coverageHolding'
+import StakingHolding from './stakingHolding'
 import Loader from '../loader'
 
 import {
@@ -56,7 +56,7 @@ const styles = theme => ({
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'start',
     justifyContent: 'center',
     minWidth: '100%',
     marginTop: '40px',
@@ -223,7 +223,7 @@ const styles = theme => ({
     justifyContent: 'flex-end',
     width: '100%'
   },
-  disaclaimer: {
+  disclaimer: {
     padding: '12px',
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
@@ -309,6 +309,8 @@ class Vault extends Component {
     this.state = {
       assets: store.getStore('vaultAssets'),
       protektContracts: store.getStore('protektContracts'),
+      coverageHoldings: store.getStore('coverageHoldings'),
+      stakingHoldings: store.getStore('stakingHoldings'),
       usdPrices: store.getStore('usdPrices'),
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null,
@@ -318,7 +320,9 @@ class Vault extends Component {
       searchError: false,
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
       basedOn: basedOn ? parseInt(basedOn) : 1,
-      loading: true
+      loading: true,
+      coverageExpanded: null,
+      stakingExpanded: null,
     }
 
     if(account && account.address) {
@@ -413,7 +417,7 @@ class Vault extends Component {
       return (
         <div className={ classes.root }>
           <div className={ classes.investedContainerLoggedOut }>
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+          <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
               <Typography variant='h3'>Connect your wallet to continue</Typography>
             </div>
@@ -426,20 +430,14 @@ class Vault extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-          <div className={ classes.filters }>
-            <div className={ classes.checkbox }>
-              <Button
-                className={ classes.actionButton }
-                color="protektGreen"
-                target="_blank"
-                href="https://airtable.com/shra7rmIpLE83v8dM"
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color={'black'}>Add new Protekt Contract</Typography>
-              </Button>
-            </div>
+          <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
+          <div>
+            <Typography variant={ 'h3' }>Your Coverage</Typography>
+            { this.renderCoverageHoldings() }
+            <br />
+            <Typography variant={ 'h3' }>Your Stake</Typography>
+            { this.renderStakingHoldings() }
           </div>
-          { this.renderProtektBlocks() }
         </div>
         { loading && <Loader /> }
         { snackbarMessage && this.renderSnackbar() }
@@ -459,30 +457,22 @@ class Vault extends Component {
     this.setState(val)
   };
 
-  renderProtektBlocks = () => {
-    const { protektContracts, assets, expanded, search, hideZero, basedOn } = this.state
+  renderCoverageHoldings = () => {
+    const { coverageHoldings, protektContracts, assets, coverageExpanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
-    return protektContracts.filter((asset) => {
-      if(hideZero && (asset.balance === 0 && asset.vaultBalance === 0)) {
-        return false
-      }
-
-      if(search && search !== '') {
-        return asset.id.toLowerCase().includes(search.toLowerCase()) ||
-              asset.name.toLowerCase().includes(search.toLowerCase()) ||
-              asset.symbol.toLowerCase().includes(search.toLowerCase()) ||
-              asset.description.toLowerCase().includes(search.toLowerCase()) ||
-              asset.vaultSymbol.toLowerCase().includes(search.toLowerCase())
-              // asset.erc20address.toLowerCase().includes(search.toLowerCase()) ||
-              // asset.vaultContractAddress.toLowerCase().includes(search.toLowerCase())
-      } else {
-        return true
-      }
-    }).map((asset) => {
+    if (!coverageHoldings || !coverageHoldings.length) {
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Typography variant={'h5'} className={ classes.grey }>No coverage yet.</Typography>
+      )
+    }
+
+    return coverageHoldings.map((temp) => {
+      let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
+
+      return (
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_cover_"+"_expand" } expanded={ coverageExpanded === asset.holdingId} onChange={ () => { this.handleCoverageChange(asset.holdingId) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -493,7 +483,7 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.logo+'.png') }
+                    src={ require('../../assets/'+asset.symbol+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
@@ -506,23 +496,84 @@ class Vault extends Component {
                 </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'COST' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.costSummaryDisplay }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'AMOUNT COVERED' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.amountCoveredToken }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'FOR' }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'COVERAGE' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
               </div>
               <div className={classes.heading}>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'FEES' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.costSummaryDisplay }</Typography>
+                <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'BACKED BY' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.strategySummaryDisplay }</Typography>
-                <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'MANAGED BY' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.claimManagerSummaryDisplay }</Typography>
               </div>
             </div>
           </AccordionSummary>
           <AccordionDetails className={ classes.removePadding }>
-            <PContract asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
+            <CoverageHolding asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
+          </AccordionDetails>
+        </Accordion>
+      )
+    })
+  }
+
+  renderStakingHoldings = () => {
+    const { stakingHoldings, protektContracts, assets, stakingExpanded, search, hideZero, basedOn } = this.state
+    const { classes } = this.props
+    const width = window.innerWidth
+
+    if (!stakingHoldings || !stakingHoldings.length) {
+      return (
+        <Typography variant={'h5'} className={ classes.grey }>Not staking yet.</Typography>
+      )
+    }
+
+    return stakingHoldings.map((temp) => {
+      let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
+
+      return (
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_stake_"+"_expand" } expanded={ stakingExpanded === asset.holdingId} onChange={ () => { this.handleStakingChange(asset.holdingId) } }>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+          >
+            <div className={ classes.assetSummary }>
+              <div className={classes.headingName}>
+                <div className={ classes.assetIcon }>
+                  <img
+                    alt=""
+                    src={ require('../../assets/'+asset.symbol+'.png') }
+                    height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                  />
+                </div>
+                <div>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredTokenSymbol }</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.insuredPool }</Typography>                </div>
+              </div>
+              <div className={classes.headingEarning}>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'YOUR STAKED AMOUNT' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.amountStakedUsd }</Typography>
+                <br/>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL APY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.shieldNetApy }</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL STAKED AMOUNT' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.shieldTotalAmountStakedUsd }</Typography>
+                <br/>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ 'INVESTMENT STRATEGY' }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ asset.strategyDisplay }</Typography>
+              </div>
+            </div>
+          </AccordionSummary>
+          <AccordionDetails className={ classes.removePadding }>
+            <StakingHolding asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
           </AccordionDetails>
         </Accordion>
       )
@@ -534,8 +585,12 @@ class Vault extends Component {
     localStorage.setItem('yearn.finance-hideZero', (event.target.checked ? '1' : '0' ))
   }
 
-  handleChange = (id) => {
-    this.setState({ expanded: this.state.expanded === id ? null : id })
+  handleCoverageChange = (id) => {
+    this.setState({ coverageExpanded: this.state.coverageExpanded === id ? null : id })
+  }
+
+  handleStakingChange = (id) => {
+    this.setState({ stakingExpanded: this.state.stakingExpanded === id ? null : id })
   }
 
   startLoading = () => {

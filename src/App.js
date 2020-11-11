@@ -23,6 +23,7 @@ import Home from './components/home';
 import Header from './components/header';
 import Vaults from './components/vault';
 import AllContracts from './components/allContracts';
+import Holdings from './components/holdings';
 import Dashboard from './components/dashboard';
 import HowItWorks from './components/howItWorks';
 
@@ -76,10 +77,14 @@ class App extends Component {
               background: "#f9fafb"
             }}>
               <Switch>
-                <Route exact path="/how-it-works" render={() => (window.location = "https://github.com/corbinpage/protekt-protocol-docs")} />
+                <Route exact path="/how-it-works" render={() => (window.location = "https://corbinpage.github.io/protekt-protocol-docs")} />
                 <Route path="/contracts">
                   <Header />
                   <AllContracts />
+                </Route>
+                <Route path="/holdings">
+                  <Header />
+                  <Holdings />
                 </Route>
                 <Redirect to="/contracts" />
               </Switch>

@@ -281,7 +281,7 @@ class Asset extends Component {
               value={ amount }
               error={ amountError }
               onChange={ this.onChange }
-              disabled={ loading }
+              disabled={ false && loading }
               placeholder="0.00"
               variant="outlined"
               onKeyDown={ this.inputKeyDown }
@@ -290,7 +290,7 @@ class Asset extends Component {
               <Button
                 className={ classes.scale }
                 variant='text'
-                disabled={ loading }
+                disabled={ false && loading  }
                 color="primary"
                 onClick={ () => { this.setAmount(25) } }>
                 <Typography variant={'h5'}>25%</Typography>

@@ -8,6 +8,8 @@ import {
 } from '@material-ui/core';
 import ReactMarkdown  from 'react-markdown';
 
+import ClaimsFields from './claimsFields'
+
 import {
   ERROR,
   DEPOSIT_VAULT,
@@ -46,7 +48,7 @@ const styles = theme => ({
     flexFlow: 'row wrap',
     width: '100%'
   },
-  protectionSection: {
+  leftSection: {
     width: '50%',
     overflow: 'auto',
     paddingBottom: '12px',
@@ -59,7 +61,7 @@ const styles = theme => ({
       flexDirection: 'column'
     }
   },
-  shieldSection: {
+  rightSection: {
     width: '50%',
     overflow: 'auto',
     paddingBottom: '12px',
@@ -187,7 +189,7 @@ const styles = theme => ({
 });
 
 
-class Asset extends Component {
+class CoverageHolding extends Component {
 
   constructor() {
     super()
@@ -241,9 +243,29 @@ class Asset extends Component {
 
     return (
       <div className={ classes.vaultContainer }>
-        <div className={classes.protectionSection}>
+        <div className={classes.leftSection}>
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h3' }>For Insurance Seekers</Typography>
+            <Typography variant={ 'h3' }>Rewards</Typography>
+          </div>
+
+          <div className={classes.labelValueContainer}>
+            <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT EARNED</Typography>
+            <Typography variant={ 'h4' }>{ '10 COMP' } </Typography>
+          </div>
+
+          <div>
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ true || loading || asset.balance <= 0 || asset.depositDisabled === true }
+              onClick={ this.onDeposit }
+              fullWidth
+              >
+              <div className={ classes.flexy }>
+                <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Get Rewards</Typography>
+              </div>
+            </Button>
           </div>
 
           <div className={classes.labelValueContainer}>
@@ -252,99 +274,49 @@ class Asset extends Component {
           </div>
 
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>COVERAGE FOR</Typography>
-            <ReactMarkdown source={asset.coverageDisplay} />
+            <Typography variant={ 'h3' }>Rewards</Typography>
           </div>
 
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>CLAIMS</Typography>
-            <div className={ classes.flexy }>
-              <ReactMarkdown source={asset.claimManagerDisplay} />
+          <div>
+            <div className={ classes.balances }>
+                <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
             </div>
-          </div>
-
-          <div className={ classes.transactionContainer }>
-            { !asset.depositDisabled &&
-              <div>
-                <div className={ classes.balances }>
-                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.underlyingTokenSymbol }</Typography>
-                </div>
-                <TextField
-                  fullWidth
-                  className={ classes.actionInput }
-                  id='amount'
-                  value={ amount }
-                  error={ amountError }
-                  onChange={ this.onChange }
-                  disabled={ loading }
-                  placeholder="0.00"
-                  variant="outlined"
-                  onKeyDown={ this.inputKeyDown }
-                />
-                <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
-                  disabled={ true || loading || asset.balance <= 0 || asset.depositDisabled === true }
-                  onClick={ this.onDeposit }
-                  fullWidth
-                  >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Start protection</Typography>
-                </Button>
-              </div>
-            }            
-            { asset.depositDisabled === true &&
-              <div className={classes.disabledContainer}>
-                <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
-              </div>
-            }
+            <TextField
+              fullWidth
+              className={ classes.actionInput }
+              id='amount'
+              value={ amount }
+              error={ amountError }
+              onChange={ this.onChange }
+              disabled={ loading }
+              placeholder="0.00"
+              variant="outlined"
+              onKeyDown={ this.inputKeyDown }
+            />
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
+              onClick={ this.onDeposit }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Withdraw</Typography>
+            </Button>
           </div>
 
         </div>
-        <div className={classes.shieldSection}>
+        <div className={classes.rightSection}>
+          
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h3' }>For Shield Miners</Typography>
+            <Typography variant={ 'h3' }>Claims</Typography>
           </div>
 
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>APY FROM FEES</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ asset.shieldNetApy } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT STAKED</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ asset.shieldTotalAmountStakedUsd } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>INVESTMENT STRATEGY</Typography>
-            <div className={ classes.flexy }>
-              <ReactMarkdown source={asset.bodyInvestmentStrategy} />
-            </div>
-          </div>
+          <ClaimsFields asset={ asset } />
 
           <div className={ classes.transactionContainer }>
             { !asset.depositDisabled &&
               <div>
-                <div className={ classes.balances }>
-                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
-                </div>
-                <TextField
-                  fullWidth
-                  className={ classes.actionInput }
-                  id='amount'
-                  value={ amount }
-                  error={ amountError }
-                  onChange={ this.onChange }
-                  disabled={ loading }
-                  placeholder="0.00"
-                  variant="outlined"
-                  onKeyDown={ this.inputKeyDown }
-                />
                 <Button
                   className={ classes.actionButton }
                   variant="outlined"
@@ -353,7 +325,7 @@ class Asset extends Component {
                   onClick={ this.onDeposit }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit to shield mine</Typography>
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Submit Claim</Typography>
                 </Button>
               </div>
             }            
@@ -482,4 +454,4 @@ class Asset extends Component {
   }
 }
 
-export default withRouter(withStyles(styles, { withTheme: true })(Asset));
+export default withRouter(withStyles(styles, { withTheme: true })(CoverageHolding));

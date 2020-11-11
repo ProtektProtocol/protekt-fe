@@ -196,6 +196,7 @@ class Header extends Component {
           </div>
           <div className={ classes.links }>
             { this.renderLinkName('contracts', 'All Protekt Contracts') }
+            { this.renderLinkName('holdings', 'Holdings') }
             { this.renderLinkName('how-it-works', 'How it works') }
           </div>
           <div className={ classes.account }>
