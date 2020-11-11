@@ -8,6 +8,8 @@ import {
 } from '@material-ui/core';
 import ReactMarkdown  from 'react-markdown';
 
+import ClaimsFields from './claimsFields'
+
 import {
   ERROR,
   DEPOSIT_VAULT,
@@ -187,7 +189,7 @@ const styles = theme => ({
 });
 
 
-class Asset extends Component {
+class StakingHolding extends Component {
 
   constructor() {
     super()
@@ -280,34 +282,8 @@ class Asset extends Component {
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h3' }>Claims</Typography>
           </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>STATUS</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ 'No claim filed' } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>PAYOUT EVENT STATUS</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ 'No event found' } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Investigation Period</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ '1 week (ie 43200 blocks)' } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Investigation End Date</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ 'Dec 1st, 2020 (Block ZZZ)' } </Typography>
-            </div>
-          </div>
+          
+          <ClaimsFields asset={ asset } />
 
           <div className={ classes.transactionContainer }>
             { !asset.depositDisabled &&
@@ -464,4 +440,4 @@ class Asset extends Component {
   }
 }
 
-export default withRouter(withStyles(styles, { withTheme: true })(Asset));
+export default withRouter(withStyles(styles, { withTheme: true })(StakingHolding));

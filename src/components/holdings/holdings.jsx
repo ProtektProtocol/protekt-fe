@@ -320,7 +320,9 @@ class Vault extends Component {
       searchError: false,
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
       basedOn: basedOn ? parseInt(basedOn) : 1,
-      loading: true
+      loading: true,
+      coverageExpanded: null,
+      stakingExpanded: null,
     }
 
     if(account && account.address) {
@@ -456,7 +458,7 @@ class Vault extends Component {
   };
 
   renderCoverageHoldings = () => {
-    const { coverageHoldings, protektContracts, assets, expanded, search, hideZero, basedOn } = this.state
+    const { coverageHoldings, protektContracts, assets, coverageExpanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
@@ -470,7 +472,7 @@ class Vault extends Component {
       let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
 
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_cover_"+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_cover_"+"_expand" } expanded={ coverageExpanded === asset.holdingId} onChange={ () => { this.handleCoverageChange(asset.holdingId) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -518,7 +520,7 @@ class Vault extends Component {
   }
 
   renderStakingHoldings = () => {
-    const { stakingHoldings, protektContracts, assets, expanded, search, hideZero, basedOn } = this.state
+    const { stakingHoldings, protektContracts, assets, stakingExpanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
@@ -532,7 +534,7 @@ class Vault extends Component {
       let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
 
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_stake_"+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_stake_"+"_expand" } expanded={ stakingExpanded === asset.holdingId} onChange={ () => { this.handleStakingChange(asset.holdingId) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -583,8 +585,12 @@ class Vault extends Component {
     localStorage.setItem('yearn.finance-hideZero', (event.target.checked ? '1' : '0' ))
   }
 
-  handleChange = (id) => {
-    this.setState({ expanded: this.state.expanded === id ? null : id })
+  handleCoverageChange = (id) => {
+    this.setState({ coverageExpanded: this.state.coverageExpanded === id ? null : id })
+  }
+
+  handleStakingChange = (id) => {
+    this.setState({ stakingExpanded: this.state.stakingExpanded === id ? null : id })
   }
 
   startLoading = () => {

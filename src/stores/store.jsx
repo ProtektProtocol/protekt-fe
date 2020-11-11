@@ -128,6 +128,14 @@ class Store {
           claimableRewardsDisabled: false,
           lastMeasurement: 10774489,
 
+          // Claims Fields
+          claimStatus: 'Active',
+          activePayoutEvent: false,
+          investigationPeriod: 43200,
+          investigationPeriodDisplay: '1 week',
+          currentInvestigationPeriodEnd: 0,
+
+
           // To be Deprecated?
           balance: 0,
           vaultBalance: 0,
