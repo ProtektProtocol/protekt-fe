@@ -8,6 +8,8 @@ import {
 } from '@material-ui/core';
 import ReactMarkdown  from 'react-markdown';
 
+import ClaimsFields from './claimsFields'
+
 import {
   ERROR,
   DEPOSIT_VAULT,
@@ -17,14 +19,12 @@ import {
   DEPOSIT_ALL_VAULT,
   DEPOSIT_ALL_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT,
-  WITHDRAW_ALL_VAULT_RETURNED,
-  START_PROTECTION
+  WITHDRAW_ALL_VAULT_RETURNED
 } from '../../constants'
 
 import { colors } from '../../theme'
 
 import Store from "../../stores";
-import { NoEthereumProviderError } from "@web3-react/injected-connector";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -61,7 +61,7 @@ const styles = theme => ({
       flexDirection: 'column'
     }
   },
-  shieldSection: {
+  rightSection: {
     width: '50%',
     overflow: 'auto',
     paddingBottom: '12px',
@@ -187,13 +187,9 @@ const styles = theme => ({
     width: '83px'
   }
 });
-/*
 
-    Asset here represents a ProtektContract not an asset
 
-*/
-
-class Asset extends Component {
+class StakingHolding extends Component {
 
   constructor() {
     super()
@@ -203,7 +199,7 @@ class Asset extends Component {
       amountError: false,
       redeemAmount: '',
       redeemAmountError: false,
-      account: store.getStore('account'), 
+      account: store.getStore('account'),
     }
   }
 
@@ -236,7 +232,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, pContract} = this.props;
+    const { classes, asset } = this.props;
     const {
       amount,
       amountError,
@@ -249,95 +245,51 @@ class Asset extends Component {
       <div className={ classes.vaultContainer }>
         <div className={classes.protectionSection}>
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h3' }>For Insurance Seekers</Typography>
+            <Typography variant={ 'h3' }>Rewards</Typography>
           </div>
 
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>COST</Typography>
-            <ReactMarkdown source={pContract.costDisplay} />
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>COVERAGE FOR</Typography>
-            <ReactMarkdown source={pContract.coverageDisplay} />
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>CLAIMS</Typography>
-            <div className={ classes.flexy }>
-              <ReactMarkdown source={pContract.claimManagerDisplay} />
-            </div>
+            <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT EARNED</Typography>
+            <Typography variant={ 'h4' }>{ asset.claimableRewardAmountToken } </Typography>
           </div>
 
           <div className={ classes.transactionContainer }>
-            { !pContract.depositsDisabled &&
+            { !asset.claimableRewardsDisabled &&
               <div>
-                <div className={ classes.balances }>
-                    <Typography variant='h4' /*onClick={ () => { this.setAmount(100) } }*/ className={ classes.value } noWrap>{ 'Your wallet: '+ (pContract.underlyingTokenBalance ? (Math.floor(pContract.underlyingTokenBalance*100000)/100000).toFixed(4) : '0.0000') } { pContract.underlyingTokenSymbol }</Typography>
-                </div>
-                <TextField
-                  fullWidth
-                  className={ classes.actionInput }
-                  id='amount'
-                  value={ amount }
-                  error={ amountError }
-                  onChange={ this.onChange }
-                  disabled={ loading }
-                  placeholder="0.00"
-                  variant="outlined"
-                  onKeyDown={ this.inputKeyDown }
-                />
                 <Button
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || pContract.underlyingTokenBalance <= 0 || pContract.depositsDisabled === true }
-                  onClick={ () => this.onDeposit('SEEKER') }
+                  disabled={ true || loading || asset.balance <= 0 || asset.depositDisabled === true }
+                  onClick={ this.onDeposit }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={pContract.disabled?'':'secondary'}>Start protection</Typography>
+                  <div className={ classes.flexy }>
+                    <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Get Rewards</Typography>
+                  </div>
                 </Button>
               </div>
             }            
-            { pContract.depositsDisabled === true &&
+            { asset.claimableRewardsDisabled === true &&
               <div className={classes.disabledContainer}>
-                <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
+                <Typography variant='h4'>Claiming rewards are currently disabled.</Typography>
               </div>
             }
           </div>
 
         </div>
-        <div className={classes.shieldSection}>
+        <div className={classes.rightSection}>
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h3' }>For Shield Miners</Typography>
+            <Typography variant={ 'h3' }>Claims</Typography>
           </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>APY FROM FEES</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ pContract.shieldNetApy } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT STAKED</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ pContract.shieldTotalAmountStakedUsd } </Typography>
-            </div>
-          </div>
-
-          <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h5' } className={ classes.grey }>INVESTMENT STRATEGY</Typography>
-            <div className={ classes.flexy }>
-              <ReactMarkdown source={pContract.strategyDisplay} />
-            </div>
-          </div>
+          
+          <ClaimsFields asset={ asset } />
 
           <div className={ classes.transactionContainer }>
-            { !pContract.depositDisabled &&
+            { !asset.depositDisabled &&
               <div>
                 <div className={ classes.balances }>
-                    <Typography variant='h4' /*onClick={ () => { this.setAmount(100) } } */ className={ classes.value } noWrap>{ 'Your wallet: '+ (pContract.reserveTokenBalance ? (Math.floor(pContract.reserveTokenBalance*100000)/100000).toFixed(4) : '0.0000') } { pContract.reserveTokenSymbol}</Typography>
+                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
                 </div>
                 <TextField
                   fullWidth
@@ -355,15 +307,15 @@ class Asset extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || pContract.reserveTokenBalance <= 0 || pContract.depositsDisabled === true }
-                  onClick={ () => this.onDeposit('INSURER') }
+                  disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
+                  onClick={ this.onDeposit }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={pContract.disabled?'':'secondary'}>Deposit to shield mine</Typography>
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Withdraw</Typography>
                 </Button>
               </div>
             }            
-            { pContract.depositDisabled === true &&
+            { asset.depositDisabled === true &&
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
               </div>
@@ -376,24 +328,24 @@ class Asset extends Component {
     )
   };
 
-  _getAPY = (pContract) => {
+  _getAPY = (asset) => {
     const { basedOn } = this.props
 
-    if(pContract && pContract.stats) {
+    if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return pContract.stats.apyThreeDaySample
+          return asset.stats.apyThreeDaySample
         case 2:
-          return pContract.stats.apyOneWeekSample
+          return asset.stats.apyOneWeekSample
         case 3:
-          return pContract.stats.apyOneMonthSample
+          return asset.stats.apyOneMonthSample
         case 4:
-          return pContract.stats.apyInceptionSample
+          return asset.stats.apyInceptionSample
         default:
-          return pContract.apy
+          return asset.apy
       }
-    } else if (pContract.apy) {
-      return pContract.apy
+    } else if (asset.apy) {
+      return asset.apy
     } else {
       return '0.00'
     }
@@ -411,95 +363,29 @@ class Asset extends Component {
     }
   }
 
-  /*
-    Users should only be able to deposit positive amounts less than their current balance.
-    Users will likely need to approve the smart contract to send the amount before depositing.
-  // */
-
-  onDeposit = (user) => {
-    // console.log(`\n \n \n \n  DEPOSIT PRESSED FOR ${user}  \n \n \n`)
+  onDeposit = () => {
     this.setState({ amountError: false })
+
     const { amount } = this.state
-    const { pContract, startLoading } = this.props
+    const { asset, startLoading } = this.props
 
-    // console.log('amount to deposit :' + amount)
-    let transactionTokenBalance = null
-    let erc20address = null
-    let vaultContractAddress = null
-
-    if(user === "INSURER"){
-      transactionTokenBalance = pContract.reserveTokenBalance
-      erc20address = pContract.reserveTokenAddress
-      vaultContractAddress = pContract.shieldTokenAddress
-    }
-    if(user === "SEEKER"){
-      transactionTokenBalance = pContract.underlyingTokenBalance
-      erc20address = pContract.underlyingTokenAddress
-      vaultContractAddress = pContract.pTokenAddress
-    }
-    
-    if(!amount || isNaN(amount) || amount <= 0 || amount > transactionTokenBalance) {
+    if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
       this.setState({ amountError: true })
       return false
     }
 
-    // console.log('passed amount test')
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
   }
 
-  // onStartProtection = () => {
-  //   console.log('\n \n \n \n  START PROTECTION PRESSED  \n \n \n')
-  //   this.setState({ amountError: false })
+  onDepositAll = () => {
+    const { asset, startLoading } = this.props
 
-  //   const { amount } = this.state
-  //   const { pContract, startLoading } = this.props
-
-  //   console.log('amount to deposit :' + amount)
-
-  //   // need to change this based on which deposit type it is
-  //   if(!amount || isNaN(amount) || amount <= 0 || amount > this.underlyingTokenBalance) {
-  //     this.setState({ amountError: true })
-  //     console.log(`hit err as ${amount} > ${this.underlyingTokenBalance}`)
-  //     return false
-  //   }
-
-  //   console.log('passed error check on protection')
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract } })
-  // }
-
-
-  // onDepositToShieldMine = () => {
-  //   console.log('\n \n \n \n  DEPOSIT PRESSED  \n \n \n')
-  //   this.setState({ amountError: false })
-
-  //   const { amount } = this.state
-  //   const { asset, startLoading } = this.props
-
-  //   console.log('amount to deposit :' + amount)
-
-  //          // need to change this based on which deposit type it is
-  //   if(!amount || isNaN(amount) || amount <= 0 || amount > this.reserveTokenBalance) {
-  //     this.setState({ amountError: true })
-  //     return false
-  //   }
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract } })
-  // }
-
-  // onDepositAll = () => {
-  //   const { asset, startLoading } = this.props
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  // }
+    this.setState({ loading: true })
+    startLoading()
+    dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
+  }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
@@ -554,4 +440,4 @@ class Asset extends Component {
   }
 }
 
-export default withRouter(withStyles(styles, { withTheme: true })(Asset));
+export default withRouter(withStyles(styles, { withTheme: true })(StakingHolding));

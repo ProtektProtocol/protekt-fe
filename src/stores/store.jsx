@@ -79,7 +79,7 @@ class Store {
     this.store = {
       protektContracts: [
         {
-          // EXAMPLE Contract Info
+          // Protekt Contract Info
           id: 'Compound-DAI-manual-market',
           name: 'Compound DAI Manual Market',
           insuredTokenSymbol: 'DAI',
@@ -134,7 +134,7 @@ class Store {
           name: 'TEST Market',
           insuredTokenSymbol: 'TEST',
           insuredPool: 'Test Pool',
-          logo: 'Test', // New
+          logo: 'cDAI-logo', // New
           description: 'A test insurance market on top of the TEST market on TEST.',
 
           // Display fields
@@ -177,6 +177,26 @@ class Store {
           withdrawalsDisabled: false,
           claimableRewardsDisabled: false,
           lastMeasurement: 10774489,
+
+          // Claims Fields
+          claimStatus: 'Active',
+          activePayoutEvent: false,
+          investigationPeriod: 43200,
+          investigationPeriodDisplay: '1 week',
+          currentInvestigationPeriodEnd: 0,
+
+
+          // To be Deprecated?
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          measurement: 1e18,
+          price_id: 'ethereum',
+          vaultContractABI: config.vaultContractV4ABI, // To be deprecated
+          vaultSymbol: 'pcDAI', // To be deprecated
+          erc20address: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae', // To be deprecated
+          vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          symbol: 'cDAI-logo', // To be deprecated
         },
         // {
         //   id: 'Uniswap-WETH',
@@ -298,6 +318,30 @@ class Store {
           // measurement: 1e18,
           // price_id: 'ethereum',
         //},
+      ],
+      coverageHoldings: [
+        {
+          protektId: 'Compound-DAI-manual-market',
+          protektIndex: 0,
+
+          // Calculated Fields
+          amountCoveredToken: 0,
+          amountCoveredUsd: 0,
+          claimableRewardAmountToken: `$10`,
+          claimableRewardAmountUsd: `$40`,
+        }
+      ],
+      stakingHoldings: [
+        {
+          protektId: 'Compound-DAI-manual-market',
+          protektIndex: 0,
+
+          // Calculated Fields
+          amountStakedToken: 10,
+          amountStakedUsd: 4000,
+          claimableRewardAmountToken: `$10`,
+          claimableRewardAmountUsd: `$40`,
+        }
       ],
       statistics: [],
       universalGasPrice: '70',
@@ -3590,7 +3634,7 @@ class Store {
     emitter.on(USD_PRICE_RETURNED, this._calculateDashboard)
     emitter.on(STATISTICS_RETURNED, this._calculateDashboard)
 
-    this.getVaultBalancesFull()
+    // this.getVaultBalancesFull()
     this.getBalancesLight()
     this.getUSDPrices()
     this.getStatistics()
