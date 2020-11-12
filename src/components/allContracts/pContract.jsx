@@ -17,8 +17,7 @@ import {
   DEPOSIT_ALL_VAULT,
   DEPOSIT_ALL_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT,
-  WITHDRAW_ALL_VAULT_RETURNED,
-  START_PROTECTION
+  WITHDRAW_ALL_VAULT_RETURNED
 } from '../../constants'
 
 import { colors } from '../../theme'
@@ -449,57 +448,6 @@ class Asset extends Component {
     dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
   }
 
-  // onStartProtection = () => {
-  //   console.log('\n \n \n \n  START PROTECTION PRESSED  \n \n \n')
-  //   this.setState({ amountError: false })
-
-  //   const { amount } = this.state
-  //   const { pContract, startLoading } = this.props
-
-  //   console.log('amount to deposit :' + amount)
-
-  //   // need to change this based on which deposit type it is
-  //   if(!amount || isNaN(amount) || amount <= 0 || amount > this.underlyingTokenBalance) {
-  //     this.setState({ amountError: true })
-  //     console.log(`hit err as ${amount} > ${this.underlyingTokenBalance}`)
-  //     return false
-  //   }
-
-  //   console.log('passed error check on protection')
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract } })
-  // }
-
-
-  // onDepositToShieldMine = () => {
-  //   console.log('\n \n \n \n  DEPOSIT PRESSED  \n \n \n')
-  //   this.setState({ amountError: false })
-
-  //   const { amount } = this.state
-  //   const { asset, startLoading } = this.props
-
-  //   console.log('amount to deposit :' + amount)
-
-  //          // need to change this based on which deposit type it is
-  //   if(!amount || isNaN(amount) || amount <= 0 || amount > this.reserveTokenBalance) {
-  //     this.setState({ amountError: true })
-  //     return false
-  //   }
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract } })
-  // }
-
-  // onDepositAll = () => {
-  //   const { asset, startLoading } = this.props
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  // }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })

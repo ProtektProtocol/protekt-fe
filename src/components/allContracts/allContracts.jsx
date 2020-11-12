@@ -495,63 +495,6 @@ class Vault extends Component {
       }
     }).map((pContract) => {
       
-
-      /*
-          Clean everything below up it's disgusting
-            - should it be called here or inside the contract from the vault?
-            - Makes no sense to get assets ((your own crypto)) from store here if not using it here and passing it down
-              - However the point of the flux emitter is to let us do things like that so not 100% sure.
-
-            - Can remove now that the balances of underlying and reserve are added to model contract :)
-      */
-      // const reserveTokenSymbol = pContract.reserveTokenSymbol
-      // const underlyingTokenSymbol = pContract.underlyingTokenSymbol
-      // var reserveTokenBalance = ""
-      // var underlyingTokenBalance = ""
-
-      // // assumes underlying and reserve can't be the same 
-      // for (var index in assets){
-      //   let currentAsset  = assets[index]
-      //   if(currentAsset.id === reserveTokenSymbol){
-      //      reserveTokenBalance =  currentAsset.balance
-      //   }
-      //   if(currentAsset.id === underlyingTokenSymbol){
-      //     underlyingTokenBalance =  currentAsset.balance
-      //   }
-      // }
-
-      // pass in actual assets
-      // var underlyingAsset = null
-      // var reserveAsset = null
-      // for (var index in assets){
-      //   let currentAsset  = assets[index]
-      //   if(currentAsset.id === pContract.reserveTokenSymbol){
-      //      reserveAsset =  currentAsset
-      //   }
-      //   if(currentAsset.id === pContract.underlyingTokenSymbol){
-      //     underlyingAsset =  currentAsset
-      //   }
-      // }
-
-      // check system actually has the assets and if not return error
-
-      // to get around the asset not existing in the store set to test (eg cDai)
-        // Change this to blacking out the component with pContract coming soon written on it & disable
-      // if(underlyingAsset == null || reserveAsset == null){
-      //   for (var index in assets){
-      //     let currentAsset  = assets[index]
-      //     if(currentAsset.id === "TESTR"){
-      //        reserveAsset =  currentAsset
-      //     }
-      //     if(currentAsset.id === "TESTU"){
-      //       underlyingAsset =  currentAsset
-      //     }
-      //   }
-      // }
-
-      // console.log(`\n \n \n creating pcontract for ${pContract.reserveTokenSymbol} & ${pContract.underlyingTokenSymbol}`)
-      // console.log(reserveAsset)
-      // console.log(reserveAsset)
       
       return (
         <Accordion className={ classes.expansionPanel } square key={ pContract.id+"_expand" } expanded={ expanded === pContract.id} onChange={ () => { this.handleChange(pContract.id) } }>
