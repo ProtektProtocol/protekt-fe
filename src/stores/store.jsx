@@ -47,7 +47,6 @@ import {
   USD_PRICE_RETURNED,
   GET_STATISTICS,
   STATISTICS_RETURNED,
-  START_PROTECTION
 } from '../constants';
 import Web3 from 'web3';
 
@@ -80,205 +79,225 @@ class Store {
     this.store = {
       protektContracts: [
         {
-          id: 'Compound-DAI',
-          name: 'Compound DAI',
-          symbol: 'cDAI-logo',
-          underlyingToken: 'DAI',
-          underlyingSmartContract: 'Compound',
+          // EXAMPLE Contract Info
+          id: 'Compound-DAI-manual-market',
+          name: 'Compound DAI Manual Market',
+          insuredTokenSymbol: 'DAI',
+          insuredPool: 'Compound',
+          logo: 'cDAI-logo', // New
+          description: 'A manual insurance market on top of the DAI market on Compound.',
+
+          // Display fields
+          costSummaryDisplay: ' 20% COMP',
+          coverageSummaryDisplay: '100% Coverage',
+          strategySummaryDisplay: 'ETH (Not invested)',
+          claimManagerSummaryDisplay: 'DAO',
+          costDisplay: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
+          coverageDisplay: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          strategyDisplay: 'Hodling (0% APY)',
+          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+
+          // pToken
           underlyingTokenSymbol: 'cDAI',
-          reserveTokenSymbol: 'WETH',
-          description: 'cDAI',
-          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-          mainLeftTopValue: '10-20% COMP',
-          mainLeftBottomLabel: 'FOR',
-          mainLeftBottomValue: '100% Coverage',
-          mainRightTopLabel: 'BACKED BY',
-          mainRightTopValue: 'ETH (Not invested)',
-          mainRightBottomLabel: 'GOVERNED BY',
-          mainRightBottomValue: 'DAO',
-          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          bodyCost: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
-          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-          bodyShieldApy: `1.40%`,
-          bodyAmountStaked: `1,000 ETH ($200k)`,
-          bodyInvestmentStrategy: `Hodling (0% APY)`,
-          depositsDisabled: false,
+          underlyingTokenAddress: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+          underlyingTokenContractABI: config.vaultContractV4ABI,
+          pTokenSymbol: 'pcDAI',
+          pTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          pTokenContractABI: config.vaultContractV4ABI,
 
-          vaultSymbol: 'pcDAI',
-          erc20address: 'Ethereum',
-          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
+          // Shield Token
+          reserveTokenSymbol: 'WETH',
+          reserveTokenAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          reserveTokenContractABI: config.vaultContractV4ABI,
+          shieldTokenSymbol: 'shWETH',
+          shieldTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          shieldTokenContractABI: config.vaultContractV4ABI,
+
+          // Calculated Fields
+          underlyingTokenBalance: 0,
+          pTokenBalance: 0,
+          reserveTokenBalance: 0,
+          shieldTokenBalance: 0,
+          shieldRewardApy: `1.40%`,
+          shieldStrategyApy: `0%`,
+          shieldNetApy: `1.40%`,
+          shieldTotalAmountStakedReserve: `1000`,
+          shieldTotalAmountStakedUsd: `$200k`,
+          depositsDisabled: false,
+          withdrawalsDisabled: false,
+          claimableRewardsDisabled: false,
           lastMeasurement: 10774489,
-          measurement: 1e18,
-          price_id: 'ethereum',
         },
         {
-          id: 'Compound-TEST',
-          name: 'Compound TEST',
-          symbol: 'cDAI-logo',
-          underlyingToken: 'TESTU',
-          underlyingSmartContract: 'TEST',
+          // TEST Contract Info
+          id: 'TEST-market',
+          name: 'TEST Market',
+          insuredTokenSymbol: 'TEST',
+          insuredPool: 'Test Pool',
+          logo: 'Test', // New
+          description: 'A test insurance market on top of the TEST market on TEST.',
+
+          // Display fields
+          costSummaryDisplay: ' 20% COMP',
+          coverageSummaryDisplay: '100% Coverage',
+          strategySummaryDisplay: 'ETH (Not invested)',
+          claimManagerSummaryDisplay: 'Flipping a coin',
+          costDisplay: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
+          coverageDisplay: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          strategyDisplay: 'Hodling (0% APY)',
+          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+
+          // pToken
           underlyingTokenSymbol: 'TESTU',
+          underlyingTokenAddress: '0x4162F62BAf5cEd4C6cbECe7e547d2aAa89949D4f',
+          underlyingTokenContractABI: config.vaultContractV4ABI,
+          pTokenSymbol: 'pTESTU',
+          pTokenAddress: '0x35fDF71b4Ec48500FC3c9E617c8960154f6014EB',
+          pTokenContractABI: config.vaultContractV4ABI,
+
+          // Shield Token
           reserveTokenSymbol: 'TESTR',
-          description: 'TESTU',
-          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-          mainLeftTopValue: '10-20% TEST',
-          mainLeftBottomLabel: 'FOR',
-          mainLeftBottomValue: '100% Coverage',
-          mainRightTopLabel: 'BACKED BY',
-          mainRightTopValue: 'ETH (Not invested)',
-          mainRightBottomLabel: 'GOVERNED BY',
-          mainRightBottomValue: 'TEST',
-          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          bodyCost: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
-          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-          bodyShieldApy: `1.40%`,
-          bodyAmountStaked: `1,000 ETH ($200k)`,
-          bodyInvestmentStrategy: `Hodling (0% APY)`,
-          depositsDisabled: false,
+          reserveTokenAddress: '0x7baCdF93AC5f58fEB8283Dd96E26710F4c7E1F40',
+          reserveTokenContractABI: config.vaultContractV4ABI,
+          shieldTokenSymbol: 'shTESTR',
+          shieldTokenAddress: '0x3b5419c9581d2cc565F029aE0c84C4C807EB8171',
+          shieldTokenContractABI: config.vaultContractV4ABI,
 
-          vaultSymbol: 'pTest',
-          erc20address: '0x7baCdF93AC5f58fEB8283Dd96E26710F4c7E1F40', // underlying - when I change this to reserve - it still sends testu and returns tes pTESTu - figure out WHY and problem is solved.
-          vaultContractAddress: '0x3b5419c9581d2cc565F029aE0c84C4C807EB8171', // pToken
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
-          lastMeasurement: 10774489,
-          measurement: 1e18,
-          price_id: 'ethereum',
-        },
-        {
-          id: 'Uniswap-WETH',
-          name: 'Uniswap WETH',
-          symbol: 'uniswap',
-          underlyingToken: 'WETH',
-          underlyingSmartContract: 'Uniswap',
-          underlyingTokenSymbol: 'UNI V2 ETH-WETH',
-          reserveTokenSymbol: 'WETH',
-          description: 'UNI V2 ETH-WETH',
-          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-          mainLeftTopValue: '20% UNI',
-          mainLeftBottomLabel: 'FOR',
-          mainLeftBottomValue: '100% Coverage',
-          mainRightTopLabel: 'BACKED BY',
-          mainRightTopValue: 'ETH (Not invested)',
-          mainRightBottomLabel: 'GOVERNED BY',
-          mainRightBottomValue: 'DAO',
-          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
-          bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
-          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-          bodyShieldApy: `2.70%`,
-          bodyAmountStaked: `1,200 ETH ($200k)`,
-          bodyInvestmentStrategy: `Hodling (0% APY)`,
+          // Calculated Fields
+          underlyingTokenBalance: 0,
+          pTokenBalance: 0,
+          reserveTokenBalance: 0,
+          shieldTokenBalance: 0,
+          shieldRewardApy: `1.40%`,
+          shieldStrategyApy: `0%`,
+          shieldNetApy: `1.40%`,
+          shieldTotalAmountStakedReserve: `1000`,
+          shieldTotalAmountStakedUsd: `$200k`,
           depositsDisabled: false,
-
-          vaultSymbol: 'pcDAI',
-          erc20address: 'Ethereum',
-          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
+          withdrawalsDisabled: false,
+          claimableRewardsDisabled: false,
           lastMeasurement: 10774489,
-          measurement: 1e18,
-          price_id: 'ethereum',
         },
-        {
-          id: 'Uniswap-WETH',
-          name: 'Uniswap WETH',
-          symbol: 'uniswap',
-          underlyingToken: 'WETH',
-          underlyingSmartContract: 'Uniswap',
-          underlyingTokenSymbol: 'UNI V2 ETH-WETH',
-          reserveTokenSymbol: 'WETH',
-          description: 'UNI V2 ETH-WETH',
-          mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-          mainLeftTopValue: '20% UNI',
-          mainLeftBottomLabel: 'FOR',
-          mainLeftBottomValue: '100% Coverage',
-          mainRightTopLabel: 'BACKED BY',
-          mainRightTopValue: 'ETH (Not invested)',
-          mainRightBottomLabel: 'GOVERNED BY',
-          mainRightBottomValue: 'DAO',
-          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
-          bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
-          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-          bodyShieldApy: `2.70%`,
-          bodyAmountStaked: `1,200 ETH ($200k)`,
-          bodyInvestmentStrategy: `Hodling (0% APY)`,
-          depositsDisabled: false,
+        // {
+        //   id: 'Uniswap-WETH',
+        //   name: 'Uniswap WETH',
+        //   symbol: 'uniswap',
+        //   underlyingToken: 'WETH',
+        //   underlyingSmartContract: 'Uniswap',
+        //   underlyingTokenSymbol: 'UNI V2 ETH-WETH',
+        //   reserveTokenSymbol: 'WETH',
+        //   description: 'UNI V2 ETH-WETH',
+        //   mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
+        //   mainLeftTopValue: '20% UNI',
+        //   mainLeftBottomLabel: 'FOR',
+        //   mainLeftBottomValue: '100% Coverage',
+        //   mainRightTopLabel: 'BACKED BY',
+        //   mainRightTopValue: 'ETH (Not invested)',
+        //   mainRightBottomLabel: 'GOVERNED BY',
+        //   mainRightBottomValue: 'DAO',
+        //   bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
+        //   bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
+        //   bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+        //   bodyShieldApy: `2.70%`,
+        //   bodyAmountStaked: `1,200 ETH ($200k)`,
+        //   bodyInvestmentStrategy: `Hodling (0% APY)`,
+        //   depositsDisabled: false,
 
-          vaultSymbol: 'pcDAI',
-          erc20address: 'Ethereum',
-          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
-          lastMeasurement: 10774489,
-          measurement: 1e18,
-          price_id: 'ethereum',
-        },
-        {
-          id: 'Aave-USDC',
-          name: 'Aave USDC',
-          symbol: 'aave',
-          underlyingToken: 'USDC',
-          underlyingSmartContract: 'Aave',
-          underlyingTokenSymbol: 'aUSDC',
-          reserveTokenSymbol: 'WETH',
-          description: 'aUSDC',
-          mainLeftTopLabel: 'PAY IN',
-          mainLeftTopValue: '0.1% fee on deposits/withdrawals',
-          mainLeftBottomLabel: 'FOR',
-          mainLeftBottomValue: '100% Coverage',
-          mainRightTopLabel: 'BACKED BY',
-          mainRightTopValue: 'USDC (Not invested)',
-          mainRightBottomLabel: 'GOVERNED BY',
-          mainRightBottomValue: 'DAO',
-          bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock token and 2) risk that **admin keys are stolen** or used to withdraw token. Not covered: 1) Risk of a USDC collapse hack or USDC lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          bodyCost: `**0.1% deposit/withdrawl fee** will be paid to Shield Miners.`,
-          bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-          bodyShieldApy: `1.70%`,
-          bodyAmountStaked: `1,500 ETH ($200k)`,
-          bodyInvestmentStrategy: `Hodling (0% APY)`,
-          depositsDisabled: false,
+        //   vaultSymbol: 'pcDAI',
+        //   erc20address: 'Ethereum',
+        //   vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+        //   vaultContractABI: config.vaultContractV4ABI,
+        //   balance: 0,
+        //   vaultBalance: 0,
+        //   decimals: 18,
+        //   deposit: true,
+        //   depositAll: false,
+        //   withdraw: true,
+        //   withdrawAll: true,
+        //   lastMeasurement: 10774489,
+        //   measurement: 1e18,
+        //   price_id: 'ethereum',
+        // },
+        // {
+        //   id: 'Uniswap-WETH',
+        //   name: 'Uniswap WETH',
+        //   symbol: 'uniswap',
+        //   underlyingToken: 'WETH',
+        //   underlyingSmartContract: 'Uniswap',
+        //   underlyingTokenSymbol: 'UNI V2 ETH-WETH',
+        //   reserveTokenSymbol: 'WETH',
+        //   description: 'UNI V2 ETH-WETH',
+        //   mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
+        //   mainLeftTopValue: '20% UNI',
+        //   mainLeftBottomLabel: 'FOR',
+        //   mainLeftBottomValue: '100% Coverage',
+        //   mainRightTopLabel: 'BACKED BY',
+        //   mainRightTopValue: 'ETH (Not invested)',
+        //   mainRightBottomLabel: 'GOVERNED BY',
+        //   mainRightBottomValue: 'DAO',
+        //   bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
+        //   bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
+        //   bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+        //   bodyShieldApy: `2.70%`,
+        //   bodyAmountStaked: `1,200 ETH ($200k)`,
+        //   bodyInvestmentStrategy: `Hodling (0% APY)`,
+        //   depositsDisabled: false,
 
-          vaultSymbol: 'paUSDC',
-          erc20address: 'Ethereum',
-          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
-          lastMeasurement: 10774489,
-          measurement: 1e18,
-          price_id: 'ethereum',
-        },
+        //   vaultSymbol: 'pcDAI',
+        //   erc20address: 'Ethereum',
+        //   vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+        //   vaultContractABI: config.vaultContractV4ABI,
+        //   balance: 0,
+        //   vaultBalance: 0,
+        //   decimals: 18,
+        //   deposit: true,
+        //   depositAll: false,
+        //   withdraw: true,
+        //   withdrawAll: true,
+        //   lastMeasurement: 10774489,
+        //   measurement: 1e18,
+        //   price_id: 'ethereum',
+        // },
+        // {
+        //   id: 'Aave-USDC',
+        //   name: 'Aave USDC',
+        //   symbol: 'aave',
+        //   underlyingToken: 'USDC',
+        //   underlyingSmartContract: 'Aave',
+          // underlyingTokenSymbol: 'aUSDC',
+          // reserveTokenSymbol: 'WETH',
+          // description: 'aUSDC',
+          // mainLeftTopLabel: 'PAY IN',
+          // mainLeftTopValue: '0.1% fee on deposits/withdrawals',
+          // mainLeftBottomLabel: 'FOR',
+          // mainLeftBottomValue: '100% Coverage',
+          // mainRightTopLabel: 'BACKED BY',
+          // mainRightTopValue: 'USDC (Not invested)',
+          // mainRightBottomLabel: 'GOVERNED BY',
+          // mainRightBottomValue: 'DAO',
+          // bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock token and 2) risk that **admin keys are stolen** or used to withdraw token. Not covered: 1) Risk of a USDC collapse hack or USDC lossing its peg. 2) Risk of flash loan or other financial exploit.`,
+          // bodyCost: `**0.1% deposit/withdrawl fee** will be paid to Shield Miners.`,
+          // bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          // bodyShieldApy: `1.70%`,
+          // bodyAmountStaked: `1,500 ETH ($200k)`,
+          // bodyInvestmentStrategy: `Hodling (0% APY)`,
+          // depositsDisabled: false,
+
+          // vaultSymbol: 'paUSDC',
+          // erc20address: 'Ethereum',
+          // vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          // vaultContractABI: config.vaultContractV4ABI,
+          // balance: 0,
+          // vaultBalance: 0,
+          // decimals: 18,
+          // deposit: true,
+          // depositAll: false,
+          // withdraw: true,
+          // withdrawAll: true,
+          // lastMeasurement: 10774489,
+          // measurement: 1e18,
+          // price_id: 'ethereum',
+        //},
       ],
       statistics: [],
       universalGasPrice: '70',
@@ -548,9 +567,6 @@ class Store {
           case GET_STATISTICS:
             this.getStatistics(payload)
             break;
-            case START_PROTECTION:
-              this.startProtection(payload)
-              break
           default: {
           }
         }
@@ -1559,18 +1575,19 @@ class Store {
       I don't actuially knwo what this is approving
 
   */
-  _checkApproval = async (asset, account, amount, contract, callback) => {
+  _checkApproval = async (erc20address, account, amount, contract, callback) => {
     console.log('\n \n \n checking approval for ASSET :')
-    console.log(asset)
-    if(asset.erc20address === 'Ethereum') {
+    // console.log(asset)
+    if(erc20address === 'Ethereum') {
       return callback()
     }
-
+    console.log('\n \n \n getting here a :')
     const web3 = new Web3(store.getStore('web3context').library.provider);
-    let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+    let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
+    console.log('\n \n \n getting here b :')
     try {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
-
+      console.log('\n \n \n getting here c :')
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
@@ -1578,9 +1595,10 @@ class Store {
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
           We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
         */
-        if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3', 'USDT', 'sCRV'].includes(asset.id) && ethAllowance > 0) {
-          await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        }
+
+        // if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3', 'USDT', 'sCRV'].includes(asset.id) && ethAllowance > 0) {
+        //   await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        // }
 
         await erc20Contract.methods.approve(contract, web3.utils.toWei('999999999999', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         callback()
@@ -1927,9 +1945,9 @@ class Store {
     })
   }
 
-  _getERC20Balance = async (web3, asset, account, callback) => {
-    console.log('getting erc20 balance for : ' + asset.id + ' ERC20ADDRESS : ' + asset.erc20address)
-    if(asset.erc20address === 'Ethereum') {
+  _getERC20Balance = async (web3, erc20address, account, callback) => {
+    console.log('getting erc20 balance for : ' + erc20address)
+    if(erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
         console.log('BALANCE FOUND : ' + eth_balance + ' for eth')
@@ -1939,20 +1957,48 @@ class Store {
         return callback(ex)
       }
     } else {
-      let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+      let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
 
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
-        balance = parseFloat(balance)/10**asset.decimals
-        // console.log('BALANCE FOUND : ' + balance + ' for ' + asset.id)
+        // balance = parseFloat(balance)/10**asset.decimals   // deprecated
+        balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
+        console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
       } catch(ex) {
         // console.log(ex)
-        // console.log(`\n \n \n \n ********* HIT ERROR OF ERC20 WITH ASSET ${asset.id} \n \n \n \n \n \n`)
+        // console.log(`\n \n \n \n ********* HIT ERROR OF ERC20 WITH ASSET ${erc20address} FOR BALANC ${balance} \n \n \n \n \n \n`)
         return callback(ex)
       }
     }
   }
+
+  // _getERC20Balance = async (web3, asset, account, callback) => {
+  //   console.log('getting erc20 balance for : ' + asset.id + ' ERC20ADDRESS : ' + asset.erc20address)
+  //   if(asset.erc20address === 'Ethereum') {
+  //     try {
+  //       const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
+  //       console.log('BALANCE FOUND : ' + eth_balance + ' for eth')
+  //       callback(null, parseFloat(eth_balance))
+  //     } catch(ex) {
+  //       console.log(ex)
+  //       return callback(ex)
+  //     }
+  //   } else {
+  //     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+
+  //     try {
+  //       var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
+  //       balance = parseFloat(balance)/10**asset.decimals
+  //       // console.log('BALANCE FOUND : ' + balance + ' for ' + asset.id)
+  //       return callback(null, parseFloat(balance))
+  //     } catch(ex) {
+  //       // console.log(ex)
+  //       // console.log(`\n \n \n \n ********* HIT ERROR OF ERC20 WITH ASSET ${asset.id} \n \n \n \n \n \n`)
+  //       return callback(ex)
+  //     }
+  //   }
+  // }
 
   _getBalance = async (web3, asset, account, callback) => {
 
@@ -2732,11 +2778,16 @@ class Store {
     })
   }
 
+  /*
+      Now not working and need to change for new pContract
+      Q: should pContract contian the balance or asset?
+  */
   getVaultBalancesFull = async () => {
     const account = store.getStore('account')
-    const assets = store.getStore('vaultAssets')
+    const pContracts = store.getStore('protektContracts')
 
-    // console.log('\n \n \n \n ********* GET BALANCES RUNNING \n \n \n \n \n \n')
+    console.log('\n \n \n \n ********* GET BALANCES RUNNING \n \n \n \n \n \n')
+    console.log(pContracts)
     
     if(!account || !account.address) {
       return false
@@ -2774,10 +2825,11 @@ class Store {
     // const usdPrices = await this._getUSDPrices()
 
 
-    async.map(assets, (asset, callback) => {
-      console.log('ASSET : ' + asset.id)
+    async.map(pContracts, (pContract, callback) => {
+      console.log(pContract)
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, pContract.underlyingTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, pContract.reserveTokenAddress, account, callbackInner) },
         // (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
         // (callbackInner) => { this._getStrategy(web3, asset, account, callbackInner) },
         // (callbackInner) => { this._getStatsAPY(vaultStatistics, asset, callbackInner) },
@@ -2788,10 +2840,13 @@ class Store {
         // (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
       ], (err, data) => {
         if(err) {
-          // console.log('\n \n \n \n ********* HIT ERR OF ASSETS \n \n \n \n \n \n')
+          console.log('\n \n \n \n ********* HIT ERR OF ASSETS \n \n \n \n \n \n')
           return callback(err)
         }
-        asset.balance = data[0]
+        console.log()
+        pContract.underlyingTokenBalance = data[0]
+        pContract.reserveTokenBalance = data[1]
+        console.log(`underlying balance : ${data[0]} reserve balance: ${data[1]}`)
         // asset.vaultBalance = data[1]
         // asset.strategy = data[2].strategy
         // asset.strategyHoldings = data[2].holdings
@@ -2805,19 +2860,19 @@ class Store {
         // asset.addressStatistics = data[7]
         // asset.addressTransactions = data[8]
 
-        callback(null, asset)
+        callback(null, pContract)
       })
-    }, (err, assets) => {
-      // console.log('\n \n \n \n ********* HIT end of async \n \n \n \n \n \n')
-      // console.log(assets)
+    }, (err, pContracts) => {
+      console.log('\n \n \n \n ********* HIT end of async \n \n \n \n \n \n')
+      // console.log(pContracts)
       if(err) {
-        // console.log('\n \n \n \n ********* HIT ERROR \n \n \n \n \n \n')
-        // console.log(err)
+        console.log('\n \n \n \n ********* HIT ERROR \n \n \n \n \n \n')
+        console.log(err)
         return emitter.emit(ERROR, err)
       }
-      // console.log(assets)
-      store.setStore({ vaultAssets: assets })
-      return emitter.emit(VAULT_BALANCES_FULL_RETURNED, assets)
+      console.log(pContracts)
+      store.setStore({ protektContracts: pContracts })
+      return emitter.emit(VAULT_BALANCES_FULL_RETURNED, pContracts)
     })
   }
 
@@ -3048,25 +3103,26 @@ class Store {
 
   depositVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount, user } = payload.content
-    console.log(`\n \n \n hit deposit for ${user}`)
+    const { asset, amount, erc20address, vaultContractAddress } = payload.content
+    //console.log(`\n \n \n hit deposit`)
 
-    this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
+    // pass in erc20 address and vault address to deposit and pass in to below
+    this._checkApproval(erc20address, account, amount, vaultContractAddress, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
 
-      this._callDepositVault(asset, account, amount, (err, depositResult) => {
+      this._callDepositVault(erc20address,vaultContractAddress, account, amount, (err, depositResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-
+        
         return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
       })
     })
   }
 
-  // startProtection = (payload) => {
+  // depositVault = (payload) => {
   //   const account = store.getStore('account')
   //   const { asset, amount } = payload.content
 
@@ -3153,20 +3209,25 @@ class Store {
     }
   }
 
-  _callDepositVault = async (asset, account, amount, callback) => {
+  /**
+   *  Need to pass in contract ABI / add it AS DOES NOT EXIST ANYMORE - add from config?
+   */
+  _callDepositVault = async (erc20address,vaultContractAddress, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
-    console.log('\n \n \n  deposit vault hit')
-    console.log('asset is : ')
-    console.log(asset)
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+    let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals !== 18) {
-      amountToSend = amount*10**asset.decimals;
-    }
-    console.log(`Sending ${amountToSend} of ${asset.erc20address} to ${asset.vaultContractAddress}`)
 
-    if(asset.erc20address === 'Ethereum') {
+    /* 
+        below is deprecated
+    */
+    // if (asset.decimals !== 18) {
+    //   amountToSend = amount*10**asset.decimals;
+    // }
+
+    console.log(`Sending ${amountToSend} of ${erc20address} to ${vaultContractAddress}`)
+
+    if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)

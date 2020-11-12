@@ -312,7 +312,6 @@ class Vault extends Component {
     const basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
 
     this.state = {
-      assets: store.getStore('vaultAssets'),
       protektContracts: store.getStore('protektContracts'),
       usdPrices: store.getStore('usdPrices'),
       account: account,
@@ -352,12 +351,11 @@ class Vault extends Component {
     emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
   };
 
-  balancesReturned = (balances) => {
+  balancesReturned = (pContracts) => {
     this.setState({
-      assets: store.getStore('vaultAssets') ,
+      protektContracts: pContracts,
       loading: false
     })
-    .then(console.log(this.state.assets))
   };
 
   connectionConnected = () => {
@@ -397,6 +395,7 @@ class Vault extends Component {
   };
 
   showHash = (txHash) => {
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
     this.setState({ loading: false })
@@ -504,22 +503,57 @@ class Vault extends Component {
             - should it be called here or inside the contract from the vault?
             - Makes no sense to get assets ((your own crypto)) from store here if not using it here and passing it down
               - However the point of the flux emitter is to let us do things like that so not 100% sure.
-      */
-      const reserveTokenSymbol = pContract.reserveTokenSymbol
-      const underlyingTokenSymbol = pContract.underlyingTokenSymbol
-      var reserveTokenBalance = ""
-      var underlyingTokenBalance = ""
 
-      // assumes underlying and reserve can't be the same - change this 
-      for (var index in assets){
-        let currentAsset  = assets[index]
-        if(currentAsset.id === reserveTokenSymbol){
-           reserveTokenBalance =  currentAsset.balance
-        }
-        if(currentAsset.id === underlyingTokenSymbol){
-          underlyingTokenBalance =  currentAsset.balance
-        }
-      }
+            - Can remove now that the balances of underlying and reserve are added to model contract :)
+      */
+      // const reserveTokenSymbol = pContract.reserveTokenSymbol
+      // const underlyingTokenSymbol = pContract.underlyingTokenSymbol
+      // var reserveTokenBalance = ""
+      // var underlyingTokenBalance = ""
+
+      // // assumes underlying and reserve can't be the same 
+      // for (var index in assets){
+      //   let currentAsset  = assets[index]
+      //   if(currentAsset.id === reserveTokenSymbol){
+      //      reserveTokenBalance =  currentAsset.balance
+      //   }
+      //   if(currentAsset.id === underlyingTokenSymbol){
+      //     underlyingTokenBalance =  currentAsset.balance
+      //   }
+      // }
+
+      // pass in actual assets
+      // var underlyingAsset = null
+      // var reserveAsset = null
+      // for (var index in assets){
+      //   let currentAsset  = assets[index]
+      //   if(currentAsset.id === pContract.reserveTokenSymbol){
+      //      reserveAsset =  currentAsset
+      //   }
+      //   if(currentAsset.id === pContract.underlyingTokenSymbol){
+      //     underlyingAsset =  currentAsset
+      //   }
+      // }
+
+      // check system actually has the assets and if not return error
+
+      // to get around the asset not existing in the store set to test (eg cDai)
+        // Change this to blacking out the component with pContract coming soon written on it & disable
+      // if(underlyingAsset == null || reserveAsset == null){
+      //   for (var index in assets){
+      //     let currentAsset  = assets[index]
+      //     if(currentAsset.id === "TESTR"){
+      //        reserveAsset =  currentAsset
+      //     }
+      //     if(currentAsset.id === "TESTU"){
+      //       underlyingAsset =  currentAsset
+      //     }
+      //   }
+      // }
+
+      // console.log(`\n \n \n creating pcontract for ${pContract.reserveTokenSymbol} & ${pContract.underlyingTokenSymbol}`)
+      // console.log(reserveAsset)
+      // console.log(reserveAsset)
       
       return (
         <Accordion className={ classes.expansionPanel } square key={ pContract.id+"_expand" } expanded={ expanded === pContract.id} onChange={ () => { this.handleChange(pContract.id) } }>
@@ -531,38 +565,39 @@ class Vault extends Component {
             <div className={ classes.assetSummary }>
               <div className={classes.headingName}>
                 <div className={ classes.assetIcon }>
-                  <img
+      
+                  {/* <img
                     alt=""
                     src={ require('../../assets/'+pContract.symbol+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={pContract.disabled?{filter:'grayscale(100%)'}:{}}
-                  />
+                  /> */}
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ pContract.underlyingToken }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ pContract.insuredTokenSymbol }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ pContract.underlyingSmartContract }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ pContract.insuredPool }</Typography>
                 </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainLeftTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ pContract.mainLeftTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>PAY IN PROTOCOL REWARDS</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.costSummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainLeftBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ pContract.mainLeftBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>FOR</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.coverageSummaryDisplay }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainRightTopLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ pContract.mainRightTopValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>BACKED BY</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.strategySummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ pContract.mainRightBottomLabel }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ pContract.mainRightBottomValue }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>GOVERNED BY</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.claimManagerSummaryDisplay}</Typography>
               </div>
             </div>
           </AccordionSummary>
           <AccordionDetails className={ classes.removePadding }>
-            <PContract reserveTokenBalance={reserveTokenBalance} underlyingTokenBalance={underlyingTokenBalance} asset={ pContract } startLoading={ this.startLoading } basedOn={ basedOn } />
+            <PContract pContract={ pContract } startLoading={ this.startLoading } basedOn={ basedOn } />
           </AccordionDetails>
         </Accordion>
       )
