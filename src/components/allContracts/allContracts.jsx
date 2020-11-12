@@ -298,6 +298,11 @@ const styles = theme => ({
   }
 });
 
+/*
+    Clear up confusion of asset / assets / ProtektContracts
+
+*/
+
 class Vault extends Component {
 
   constructor(props) {
@@ -307,7 +312,6 @@ class Vault extends Component {
     const basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
 
     this.state = {
-      assets: store.getStore('vaultAssets'),
       protektContracts: store.getStore('protektContracts'),
       usdPrices: store.getStore('usdPrices'),
       account: account,
@@ -347,9 +351,10 @@ class Vault extends Component {
     emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
   };
 
-  balancesReturned = (balances) => {
+  // doesnt work passing it as props or calling it from store
+  balancesReturned = (pContracts) => {
     this.setState({
-      assets: store.getStore('vaultAssets') ,
+      protektContracts: pContracts,
       loading: false
     })
   };
@@ -365,7 +370,7 @@ class Vault extends Component {
 
     dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
 
-    const that = this
+    const that = this 
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
       that.setState(snackbarObj)
@@ -391,6 +396,7 @@ class Vault extends Component {
   };
 
   showHash = (txHash) => {
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
     this.setState({ loading: false })
@@ -402,6 +408,7 @@ class Vault extends Component {
   };
 
   render() {
+    
     const { classes } = this.props;
     const {
       loading,
@@ -464,25 +471,33 @@ class Vault extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    return protektContracts.filter((asset) => {
-      if(hideZero && (asset.balance === 0 && asset.vaultBalance === 0)) {
+    console.log('\n \n \n Inside protekt block')
+    console.log('ASSETS:')
+    console.log(assets)
+    console.log('pContracts:')
+    console.log(protektContracts)
+    return protektContracts.filter((pContract) => {
+
+      if(hideZero && (pContract.balance === 0 && pContract.vaultBalance === 0)) {
         return false
       }
 
       if(search && search !== '') {
-        return asset.id.toLowerCase().includes(search.toLowerCase()) ||
-              asset.name.toLowerCase().includes(search.toLowerCase()) ||
-              asset.symbol.toLowerCase().includes(search.toLowerCase()) ||
-              asset.description.toLowerCase().includes(search.toLowerCase()) ||
-              asset.vaultSymbol.toLowerCase().includes(search.toLowerCase())
+        return  pContract.id.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.name.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.symbol.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.description.toLowerCase().includes(search.toLowerCase()) ||
+                pContract.vaultSymbol.toLowerCase().includes(search.toLowerCase())
               // asset.erc20address.toLowerCase().includes(search.toLowerCase()) ||
               // asset.vaultContractAddress.toLowerCase().includes(search.toLowerCase())
       } else {
         return true
       }
-    }).map((asset) => {
+    }).map((pContract) => {
+      
+      
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+        <Accordion className={ classes.expansionPanel } square key={ pContract.id+"_expand" } expanded={ expanded === pContract.id} onChange={ () => { this.handleChange(pContract.id) } }>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -491,38 +506,39 @@ class Vault extends Component {
             <div className={ classes.assetSummary }>
               <div className={classes.headingName}>
                 <div className={ classes.assetIcon }>
+      
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.logo+'.png') }
+                    src={ require('../../assets/'+pContract.logo+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                    style={pContract.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'PROTECTS' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.insuredTokenSymbol }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ pContract.insuredTokenSymbol }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ 'IN' }</Typography>
-                  <Typography variant={ 'h3' } noWrap>{ asset.insuredPool }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ pContract.insuredPool }</Typography>
                 </div>
               </div>
               <div className={classes.headingEarning}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'COST' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.costSummaryDisplay }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>PAY IN PROTOCOL REWARDS</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.costSummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'FOR' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>FOR</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.coverageSummaryDisplay }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'BACKED BY' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.strategySummaryDisplay }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>BACKED BY</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.strategySummaryDisplay }</Typography>
                 <br/>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ 'MANAGED BY' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.claimManagerSummaryDisplay }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>GOVERNED BY</Typography>
+                <Typography variant={ 'h3' } noWrap>{ pContract.claimManagerSummaryDisplay}</Typography>
               </div>
             </div>
           </AccordionSummary>
           <AccordionDetails className={ classes.removePadding }>
-            <PContract asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
+            <PContract pContract={ pContract } startLoading={ this.startLoading } basedOn={ basedOn } />
           </AccordionDetails>
         </Accordion>
       )

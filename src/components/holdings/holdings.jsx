@@ -469,7 +469,9 @@ class Vault extends Component {
     }
 
     return coverageHoldings.map((temp) => {
-      let asset = { ...temp,  ...protektContracts[temp.protektIndex] }
+      let asset = { ...temp,  ...protektContracts[temp.protektIndex] } 
+      console.log('\n \n \n holdings map')
+      console.log(asset)
 
       return (
         <Accordion className={ classes.expansionPanel } square key={ asset.id+"_cover_"+"_expand" } expanded={ coverageExpanded === asset.holdingId} onChange={ () => { this.handleCoverageChange(asset.holdingId) } }>
@@ -483,7 +485,7 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'.png') }
+                    src={ require('../../assets/'+asset.logo+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
@@ -545,7 +547,7 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'.png') }
+                    src={ require('../../assets/'+asset.logo+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />

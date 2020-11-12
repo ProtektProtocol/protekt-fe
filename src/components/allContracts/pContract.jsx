@@ -23,6 +23,7 @@ import {
 import { colors } from '../../theme'
 
 import Store from "../../stores";
+import { NoEthereumProviderError } from "@web3-react/injected-connector";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -185,7 +186,11 @@ const styles = theme => ({
     width: '83px'
   }
 });
+/*
 
+    Asset here represents a ProtektContract not an asset
+
+*/
 
 class Asset extends Component {
 
@@ -197,7 +202,7 @@ class Asset extends Component {
       amountError: false,
       redeemAmount: '',
       redeemAmountError: false,
-      account: store.getStore('account'),
+      account: store.getStore('account'), 
     }
   }
 
@@ -230,7 +235,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, asset } = this.props;
+    const { classes, pContract} = this.props;
     const {
       amount,
       amountError,
@@ -248,26 +253,26 @@ class Asset extends Component {
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>COST</Typography>
-            <ReactMarkdown source={asset.costDisplay} />
+            <ReactMarkdown source={pContract.costDisplay} />
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>COVERAGE FOR</Typography>
-            <ReactMarkdown source={asset.coverageDisplay} />
+            <ReactMarkdown source={pContract.coverageDisplay} />
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>CLAIMS</Typography>
             <div className={ classes.flexy }>
-              <ReactMarkdown source={asset.claimManagerDisplay} />
+              <ReactMarkdown source={pContract.claimManagerDisplay} />
             </div>
           </div>
 
           <div className={ classes.transactionContainer }>
-            { !asset.depositDisabled &&
+            { !pContract.depositsDisabled &&
               <div>
                 <div className={ classes.balances }>
-                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.underlyingTokenSymbol }</Typography>
+                    <Typography variant='h4' /*onClick={ () => { this.setAmount(100) } }*/ className={ classes.value } noWrap>{ 'Your wallet: '+ (pContract.underlyingTokenBalance ? (Math.floor(pContract.underlyingTokenBalance*100000)/100000).toFixed(4) : '0.0000') } { pContract.underlyingTokenSymbol }</Typography>
                 </div>
                 <TextField
                   fullWidth
@@ -285,15 +290,15 @@ class Asset extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ true || loading || asset.balance <= 0 || asset.depositDisabled === true }
-                  onClick={ this.onDeposit }
+                  disabled={ loading || pContract.underlyingTokenBalance <= 0 || pContract.depositsDisabled === true }
+                  onClick={ () => this.onDeposit('SEEKER') }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Start protection</Typography>
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={pContract.disabled?'':'secondary'}>Start protection</Typography>
                 </Button>
               </div>
             }            
-            { asset.depositDisabled === true &&
+            { pContract.depositsDisabled === true &&
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
               </div>
@@ -309,29 +314,29 @@ class Asset extends Component {
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>APY FROM FEES</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ asset.shieldNetApy } </Typography>
+              <Typography variant={ 'h4' }>{ pContract.shieldNetApy } </Typography>
             </div>
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>AMOUNT STAKED</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' }>{ asset.shieldTotalAmountStakedUsd } </Typography>
+              <Typography variant={ 'h4' }>{ pContract.shieldTotalAmountStakedUsd } </Typography>
             </div>
           </div>
 
           <div className={classes.labelValueContainer}>
             <Typography variant={ 'h5' } className={ classes.grey }>INVESTMENT STRATEGY</Typography>
             <div className={ classes.flexy }>
-              <ReactMarkdown source={asset.bodyInvestmentStrategy} />
+              <ReactMarkdown source={pContract.strategyDisplay} />
             </div>
           </div>
 
           <div className={ classes.transactionContainer }>
-            { !asset.depositDisabled &&
+            { !pContract.depositDisabled &&
               <div>
                 <div className={ classes.balances }>
-                    <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
+                    <Typography variant='h4' /*onClick={ () => { this.setAmount(100) } } */ className={ classes.value } noWrap>{ 'Your wallet: '+ (pContract.reserveTokenBalance ? (Math.floor(pContract.reserveTokenBalance*100000)/100000).toFixed(4) : '0.0000') } { pContract.reserveTokenSymbol}</Typography>
                 </div>
                 <TextField
                   fullWidth
@@ -349,15 +354,15 @@ class Asset extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
-                  onClick={ this.onDeposit }
+                  disabled={ loading || pContract.reserveTokenBalance <= 0 || pContract.depositsDisabled === true }
+                  onClick={ () => this.onDeposit('INSURER') }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit to shield mine</Typography>
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={pContract.disabled?'':'secondary'}>Deposit to shield mine</Typography>
                 </Button>
               </div>
             }            
-            { asset.depositDisabled === true &&
+            { pContract.depositDisabled === true &&
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
               </div>
@@ -370,24 +375,24 @@ class Asset extends Component {
     )
   };
 
-  _getAPY = (asset) => {
+  _getAPY = (pContract) => {
     const { basedOn } = this.props
 
-    if(asset && asset.stats) {
+    if(pContract && pContract.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyThreeDaySample
+          return pContract.stats.apyThreeDaySample
         case 2:
-          return asset.stats.apyOneWeekSample
+          return pContract.stats.apyOneWeekSample
         case 3:
-          return asset.stats.apyOneMonthSample
+          return pContract.stats.apyOneMonthSample
         case 4:
-          return asset.stats.apyInceptionSample
+          return pContract.stats.apyInceptionSample
         default:
-          return asset.apy
+          return pContract.apy
       }
-    } else if (asset.apy) {
-      return asset.apy
+    } else if (pContract.apy) {
+      return pContract.apy
     } else {
       return '0.00'
     }
@@ -405,29 +410,44 @@ class Asset extends Component {
     }
   }
 
-  onDeposit = () => {
+  /*
+    Users should only be able to deposit positive amounts less than their current balance.
+    Users will likely need to approve the smart contract to send the amount before depositing.
+  // */
+
+  onDeposit = (user) => {
+    // console.log(`\n \n \n \n  DEPOSIT PRESSED FOR ${user}  \n \n \n`)
     this.setState({ amountError: false })
-
     const { amount } = this.state
-    const { asset, startLoading } = this.props
+    const { pContract, startLoading } = this.props
 
-    if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
+    // console.log('amount to deposit :' + amount)
+    let transactionTokenBalance = null
+    let erc20address = null
+    let vaultContractAddress = null
+
+    if(user === "INSURER"){
+      transactionTokenBalance = pContract.reserveTokenBalance
+      erc20address = pContract.reserveTokenAddress
+      vaultContractAddress = pContract.shieldTokenAddress
+    }
+    if(user === "SEEKER"){
+      transactionTokenBalance = pContract.underlyingTokenBalance
+      erc20address = pContract.underlyingTokenAddress
+      vaultContractAddress = pContract.pTokenAddress
+    }
+    
+    if(!amount || isNaN(amount) || amount <= 0 || amount > transactionTokenBalance) {
       this.setState({ amountError: true })
       return false
     }
 
+    // console.log('passed amount test')
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
   }
 
-  onDepositAll = () => {
-    const { asset, startLoading } = this.props
-
-    this.setState({ loading: true })
-    startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
