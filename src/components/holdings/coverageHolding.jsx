@@ -274,7 +274,7 @@ class CoverageHolding extends Component {
           </div>
 
           <div className={classes.labelValueContainer}>
-            <Typography variant={ 'h3' }>Rewards</Typography>
+            <Typography variant={ 'h3' }>Withdrawals</Typography>
           </div>
 
           <div>

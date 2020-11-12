@@ -547,7 +547,7 @@ class Vault extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'.png') }
+                    src={ require('../../assets/'+asset.logo+'.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
