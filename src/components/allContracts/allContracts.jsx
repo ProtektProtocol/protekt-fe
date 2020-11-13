@@ -28,6 +28,7 @@ import Loader from '../loader'
 import {
   ERROR,
   GET_PROTEKT_CONTRACT_BALANCES,
+  BALANCES_RETURNED,
   GET_VAULT_BALANCES_FULL,
   VAULT_BALANCES_FULL_RETURNED,
   DEPOSIT_VAULT_RETURNED,
@@ -333,32 +334,24 @@ class Vault extends Component {
   }
   componentWillMount() {
     emitter.on(DEPOSIT_VAULT_RETURNED, this.showHash);
-    emitter.on(WITHDRAW_VAULT_RETURNED, this.showHash);
     emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
-    emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    // emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.on(BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
 
   componentWillUnmount() {
     emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.showHash);
-    emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.showHash);
     emitter.removeListener(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
-    emitter.removeListener(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    // emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
 
-  // doesnt work passing it as props or calling it from store
   balancesReturned = (pContracts) => {
-    this.setState({
-      protektContracts: pContracts,
-      loading: false
-    })
+    this.setState({ loading: false })
   };
 
   connectionConnected = () => {

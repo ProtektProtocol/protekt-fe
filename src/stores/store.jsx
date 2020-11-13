@@ -1449,29 +1449,17 @@ class Store {
   }
 
   _checkApproval = async (erc20address, account, amount, contract, callback) => {
-    console.log('\n \n \n checking approval for ASSET :')
     // console.log(asset)
     if(erc20address === 'Ethereum') {
       return callback()
     }
-    console.log('\n \n \n getting here a :')
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
-    console.log('\n \n \n getting here b :')
     try {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
-      console.log('\n \n \n getting here c :')
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
-        /*
-          code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
-          We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
-        */
-
-        // if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3', 'USDT', 'sCRV'].includes(asset.id) && ethAllowance > 0) {
-        //   await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        // }
 
         await erc20Contract.methods.approve(contract, web3.utils.toWei('999999999999', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         callback()
@@ -1776,6 +1764,7 @@ class Store {
 
     const protektContracts = store.getStore('protektContracts')
 
+
     if(!account || !account.address) {
       return false
     }
@@ -1873,8 +1862,7 @@ class Store {
         console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
       } catch(ex) {
-        // console.log(ex)
-        // console.log(`\n \n \n \n ********* HIT ERROR OF ERC20 WITH ASSET ${erc20address} FOR BALANC ${balance} \n \n \n \n \n \n`)
+        console.log(ex)
         return callback(ex)
       }
     }
@@ -2621,45 +2609,45 @@ class Store {
   //   })
   // }
 
-  _callIDAI = async (sendAsset, receiveAsset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+  // _callIDAI = async (sendAsset, receiveAsset, account, amount, callback) => {
+  //   const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    var amountToSend = web3.utils.toWei(amount, "ether")
-    if (sendAsset.decimals !== 18) {
-      amountToSend = amount*10**sendAsset.decimals;
-    }
+  //   var amountToSend = web3.utils.toWei(amount, "ether")
+  //   if (sendAsset.decimals !== 18) {
+  //     amountToSend = amount*10**sendAsset.decimals;
+  //   }
 
-    let call = 'swapiDAItoyDAI'
+  //   let call = 'swapiDAItoyDAI'
 
-    let iDAIZapSwapContract = new web3.eth.Contract(config.iDAIZapSwapABI, config.iDAIZapSwapAddress)
-    iDAIZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-      .on('transactionHash', function(hash){
-        console.log(hash)
-        callback(null, hash)
-      })
-      .on('confirmation', function(confirmationNumber, receipt){
-        console.log(confirmationNumber, receipt);
-      })
-      .on('receipt', function(receipt){
-        console.log(receipt);
-      })
-      .on('error', function(error) {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-      .catch((error) => {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-  }
+  //   let iDAIZapSwapContract = new web3.eth.Contract(config.iDAIZapSwapABI, config.iDAIZapSwapAddress)
+  //   iDAIZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+  //     .on('transactionHash', function(hash){
+  //       console.log(hash)
+  //       callback(null, hash)
+  //     })
+  //     .on('confirmation', function(confirmationNumber, receipt){
+  //       console.log(confirmationNumber, receipt);
+  //     })
+  //     .on('receipt', function(receipt){
+  //       console.log(receipt);
+  //     })
+  //     .on('error', function(error) {
+  //       if (!error.toString().includes("-32601")) {
+  //         if(error.message) {
+  //           return callback(error.message)
+  //         }
+  //         callback(error)
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       if (!error.toString().includes("-32601")) {
+  //         if(error.message) {
+  //           return callback(error.message)
+  //         }
+  //         callback(error)
+  //       }
+  //     })
+  // }
 
   // getCurveBalances = (payload) => {
   //   const account = store.getStore('account')
@@ -2802,55 +2790,55 @@ class Store {
     }
   }
 
-  _getStrategy = async (web3, asset, account, callback) => {
+  // _getStrategy = async (web3, asset, account, callback) => {
 
-    if(['LINK'].includes(asset.id) ) {
-      return callback(null, {
-        strategy: '',
-        name: '',
-        holdings: 0
-      })
-    }
+  //   if(['LINK'].includes(asset.id) ) {
+  //     return callback(null, {
+  //       strategy: '',
+  //       name: '',
+  //       holdings: 0
+  //     })
+  //   }
 
-    try {
-      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-      const controllerAddress = await vaultContract.methods.controller().call({ from: account.address })
-      const controllerContract = new web3.eth.Contract(config.vaultControllerABI, controllerAddress)
+  //   try {
+  //     const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+  //     const controllerAddress = await vaultContract.methods.controller().call({ from: account.address })
+  //     const controllerContract = new web3.eth.Contract(config.vaultControllerABI, controllerAddress)
 
-      let strategyAddress = ''
-      if(['LINK', 'aLINK'].includes(asset.id)) {
-        strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
-      } else {
+  //     let strategyAddress = ''
+  //     if(['LINK', 'aLINK'].includes(asset.id)) {
+  //       strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
+  //     } else {
 
-        if(asset.erc20address === 'Ethereum') {
-          asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        }
-        strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
-      }
+  //       if(asset.erc20address === 'Ethereum') {
+  //         asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+  //       }
+  //       strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
+  //     }
 
-      const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
-      const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
-      let strategyName = 'StrategyDForceUSDC'
+  //     const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
+  //     const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
+  //     let strategyName = 'StrategyDForceUSDC'
 
-      if(!['USDC'].includes(asset.id)) {
-        strategyName = await strategyContract.methods.getName().call({ from: account.address })
-      }
+  //     if(!['USDC'].includes(asset.id)) {
+  //       strategyName = await strategyContract.methods.getName().call({ from: account.address })
+  //     }
 
-      callback(null, {
-        strategy: strategyAddress,
-        name: strategyName,
-        holdings: holdings/(10**(asset.id === 'aLINK' ? 6 : asset.decimals))
-      })
-    } catch (ex) {
-      console.log(asset)
-      console.log(ex)
-      callback(null, {
-        strategy: '',
-        name: '',
-        holdings: 0
-      })
-    }
-  }
+  //     callback(null, {
+  //       strategy: strategyAddress,
+  //       name: strategyName,
+  //       holdings: holdings/(10**(asset.id === 'aLINK' ? 6 : asset.decimals))
+  //     })
+  //   } catch (ex) {
+  //     console.log(asset)
+  //     console.log(ex)
+  //     callback(null, {
+  //       strategy: '',
+  //       name: '',
+  //       holdings: 0
+  //     })
+  //   }
+  // }
 
   _getStatsAPY = (vaultStatistics, asset, callback) => {
     try {
@@ -3023,8 +3011,6 @@ class Store {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-        
-        return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
       })
     })
   }
@@ -3145,6 +3131,8 @@ class Store {
         })
         .on('receipt', function(receipt){
           console.log(receipt);
+        
+          emitter.emit(DEPOSIT_VAULT_RETURNED, receipt)
         })
         .on('error', function(error) {
           if (!error.toString().includes("-32601")) {
@@ -3165,14 +3153,17 @@ class Store {
     } else {
       vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
-          console.log(hash)
+          // console.log(hash)
           callback(null, hash)
         })
         .on('confirmation', function(confirmationNumber, receipt){
-          console.log(confirmationNumber, receipt);
+          // console.log(confirmationNumber, receipt);
         })
         .on('receipt', function(receipt){
           console.log(receipt);
+
+          emitter.emit(DEPOSIT_VAULT_RETURNED, receipt.transactionHash
+            )
         })
         .on('error', function(error) {
           if (!error.toString().includes("-32601")) {
