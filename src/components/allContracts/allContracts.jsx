@@ -27,6 +27,7 @@ import Loader from '../loader'
 
 import {
   ERROR,
+  GET_PROTEKT_CONTRACT_BALANCES,
   GET_VAULT_BALANCES_FULL,
   VAULT_BALANCES_FULL_RETURNED,
   DEPOSIT_VAULT_RETURNED,
@@ -326,7 +327,8 @@ class Vault extends Component {
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+      // dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+      dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
     }
   }
   componentWillMount() {
@@ -335,7 +337,7 @@ class Vault extends Component {
     emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    // emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
@@ -348,7 +350,7 @@ class Vault extends Component {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    // emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
   };
 
   // doesnt work passing it as props or calling it from store
@@ -368,7 +370,8 @@ class Vault extends Component {
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
 
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    // dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
 
     const that = this 
     setTimeout(() => {
@@ -396,7 +399,8 @@ class Vault extends Component {
   };
 
   showHash = (txHash) => {
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    // dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
     this.setState({ loading: false })
@@ -471,11 +475,11 @@ class Vault extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    console.log('\n \n \n Inside protekt block')
-    console.log('ASSETS:')
-    console.log(assets)
-    console.log('pContracts:')
-    console.log(protektContracts)
+    // console.log('\n \n \n Inside protekt block')
+    // console.log('ASSETS:')
+    // console.log(assets)
+    // console.log('pContracts:')
+    // console.log(protektContracts)
     return protektContracts.filter((pContract) => {
 
       if(hideZero && (pContract.balance === 0 && pContract.vaultBalance === 0)) {
@@ -589,69 +593,6 @@ class Vault extends Component {
     }
   }
 
-  renderBasedOn = () => {
-
-    const { classes } = this.props
-    const { basedOn, loading } = this.state
-
-    const options = [
-      {
-        value: 1,
-        description: '3 days'
-      },
-      {
-        value: 2,
-        description: '1 week'
-      },
-      {
-        value: 3,
-        description: '1 month'
-      },
-      {
-        value: 4,
-        description: 'inception'
-      }
-    ]
-
-    return (
-      <div className={ classes.basedOnContainer }>
-        <InfoIcon className={ classes.infoIcon } />
-        <TextField
-          id={ 'basedOn' }
-          name={ 'basedOn' }
-          select
-          value={ basedOn }
-          onChange={ this.onSelectChange }
-          SelectProps={{
-            native: false
-          }}
-          disabled={ loading }
-          className={ classes.assetSelectRoot }
-        >
-        { options &&
-          options.map((option) => {
-            return (
-              <MenuItem key={ option.value } value={ option.value }>
-                <Typography variant='h4'>{ option.description }</Typography>
-              </MenuItem>
-            )
-          })
-        }
-      </TextField>
-      </div>
-    )
-  }
-
-  onSelectChange = (event) => {
-    let val = []
-    val[event.target.name] = event.target.value
-    this.setState(val)
-
-    localStorage.setItem('yearn.finance-dashboard-basedon', event.target.value)
-
-    this.setState({ loading: true })
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
-  }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(Vault)));
