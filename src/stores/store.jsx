@@ -2,6 +2,7 @@ import config from "../config";
 import async from 'async';
 import {
   ERROR,
+  GET_PROTEKT_CONTRACT_BALANCES,
   GET_BALANCES,
   BALANCES_RETURNED,
   GET_BALANCES_LIGHT,
@@ -79,56 +80,6 @@ class Store {
     this.store = {
       protektContracts: [
         {
-          // Protekt Contract Info
-          id: 'Compound-DAI-manual-market',
-          name: 'Compound DAI Manual Market',
-          insuredTokenSymbol: 'DAI',
-          insuredPool: 'Compound',
-          logo: 'cDAI-logo', // New
-          description: 'A manual insurance market on top of the DAI market on Compound.',
-
-          // Display fields
-          costSummaryDisplay: ' 20% COMP',
-          coverageSummaryDisplay: '100% Coverage',
-          strategySummaryDisplay: 'ETH (Not invested)',
-          claimManagerSummaryDisplay: 'DAO',
-          costDisplay: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
-          coverageDisplay: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          strategyDisplay: 'Hodling (0% APY)',
-          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-
-          // pToken
-          underlyingTokenSymbol: 'cDAI',
-          underlyingTokenAddress: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
-          underlyingTokenContractABI: config.vaultContractV4ABI,
-          pTokenSymbol: 'pcDAI',
-          pTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
-          pTokenContractABI: config.vaultContractV4ABI,
-
-          // Shield Token
-          reserveTokenSymbol: 'WETH',
-          reserveTokenAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-          reserveTokenContractABI: config.vaultContractV4ABI,
-          shieldTokenSymbol: 'shWETH',
-          shieldTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
-          shieldTokenContractABI: config.vaultContractV4ABI,
-
-          // Calculated Fields
-          underlyingTokenBalance: 0,
-          pTokenBalance: 0,
-          reserveTokenBalance: 0,
-          shieldTokenBalance: 0,
-          shieldRewardApy: `1.40%`,
-          shieldStrategyApy: `0%`,
-          shieldNetApy: `1.40%`,
-          shieldTotalAmountStakedReserve: `1000`,
-          shieldTotalAmountStakedUsd: `$200k`,
-          depositsDisabled: false,
-          withdrawalsDisabled: false,
-          claimableRewardsDisabled: false,
-          lastMeasurement: 10774489,
-        },
-        {
           // TEST Contract Info
           id: 'TEST-market',
           name: 'TEST Market',
@@ -149,19 +100,24 @@ class Store {
 
           // pToken
           underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0x4162F62BAf5cEd4C6cbECe7e547d2aAa89949D4f',
+          underlyingTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0x35fDF71b4Ec48500FC3c9E617c8960154f6014EB',
+          pTokenAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
           pTokenContractABI: config.vaultContractV4ABI,
+          feeModelAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
 
           // Shield Token
           reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x7baCdF93AC5f58fEB8283Dd96E26710F4c7E1F40',
+          reserveTokenAddress: '0x7856BBb02f4d6A7FE95bb6F823bD3C34Ce5baD6f',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x3b5419c9581d2cc565F029aE0c84C4C807EB8171',
+          shieldTokenAddress: '0x8Ef9221539b36EaF757F5e33e848f6d9c904b1f0',
           shieldTokenContractABI: config.vaultContractV4ABI,
+          controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
+          strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
+          claimsManagerAddress: '0x73edc408d780A5073beC50488923859f01aB0785',
+
 
           // Calculated Fields
           underlyingTokenBalance: 0,
@@ -185,7 +141,6 @@ class Store {
           investigationPeriodDisplay: '1 week',
           currentInvestigationPeriodEnd: 0,
 
-
           // To be Deprecated?
           balance: 0,
           vaultBalance: 0,
@@ -198,142 +153,22 @@ class Store {
           vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
           symbol: 'cDAI-logo', // To be deprecated
         },
-        // {
-        //   id: 'Uniswap-WETH',
-        //   name: 'Uniswap WETH',
-        //   symbol: 'uniswap',
-        //   underlyingToken: 'WETH',
-        //   underlyingSmartContract: 'Uniswap',
-        //   underlyingTokenSymbol: 'UNI V2 ETH-WETH',
-        //   reserveTokenSymbol: 'WETH',
-        //   description: 'UNI V2 ETH-WETH',
-        //   mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-        //   mainLeftTopValue: '20% UNI',
-        //   mainLeftBottomLabel: 'FOR',
-        //   mainLeftBottomValue: '100% Coverage',
-        //   mainRightTopLabel: 'BACKED BY',
-        //   mainRightTopValue: 'ETH (Not invested)',
-        //   mainRightBottomLabel: 'GOVERNED BY',
-        //   mainRightBottomValue: 'DAO',
-        //   bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
-        //   bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
-        //   bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-        //   bodyShieldApy: `2.70%`,
-        //   bodyAmountStaked: `1,200 ETH ($200k)`,
-        //   bodyInvestmentStrategy: `Hodling (0% APY)`,
-        //   depositsDisabled: false,
-
-        //   vaultSymbol: 'pcDAI',
-        //   erc20address: 'Ethereum',
-        //   vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-        //   vaultContractABI: config.vaultContractV4ABI,
-        //   balance: 0,
-        //   vaultBalance: 0,
-        //   decimals: 18,
-        //   deposit: true,
-        //   depositAll: false,
-        //   withdraw: true,
-        //   withdrawAll: true,
-        //   lastMeasurement: 10774489,
-        //   measurement: 1e18,
-        //   price_id: 'ethereum',
-        // },
-        // {
-        //   id: 'Uniswap-WETH',
-        //   name: 'Uniswap WETH',
-        //   symbol: 'uniswap',
-        //   underlyingToken: 'WETH',
-        //   underlyingSmartContract: 'Uniswap',
-        //   underlyingTokenSymbol: 'UNI V2 ETH-WETH',
-        //   reserveTokenSymbol: 'WETH',
-        //   description: 'UNI V2 ETH-WETH',
-        //   mainLeftTopLabel: 'PAY IN PROTOCOL REWARDS',
-        //   mainLeftTopValue: '20% UNI',
-        //   mainLeftBottomLabel: 'FOR',
-        //   mainLeftBottomValue: '100% Coverage',
-        //   mainRightTopLabel: 'BACKED BY',
-        //   mainRightTopValue: 'ETH (Not invested)',
-        //   mainRightBottomLabel: 'GOVERNED BY',
-        //   mainRightBottomValue: 'DAO',
-        //   bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock WETH and 2) risk that **admin keys are stolen** or used to withdraw WETH. Not covered: 1) Risk of a WETH contract hack. 2) Risk of flash loan or other financial exploit.`,
-        //   bodyCost: `**20% UNI** rewards of your deposited WETH will be redirected to Shield Miners.`,
-        //   bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-        //   bodyShieldApy: `2.70%`,
-        //   bodyAmountStaked: `1,200 ETH ($200k)`,
-        //   bodyInvestmentStrategy: `Hodling (0% APY)`,
-        //   depositsDisabled: false,
-
-        //   vaultSymbol: 'pcDAI',
-        //   erc20address: 'Ethereum',
-        //   vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-        //   vaultContractABI: config.vaultContractV4ABI,
-        //   balance: 0,
-        //   vaultBalance: 0,
-        //   decimals: 18,
-        //   deposit: true,
-        //   depositAll: false,
-        //   withdraw: true,
-        //   withdrawAll: true,
-        //   lastMeasurement: 10774489,
-        //   measurement: 1e18,
-        //   price_id: 'ethereum',
-        // },
-        // {
-        //   id: 'Aave-USDC',
-        //   name: 'Aave USDC',
-        //   symbol: 'aave',
-        //   underlyingToken: 'USDC',
-        //   underlyingSmartContract: 'Aave',
-          // underlyingTokenSymbol: 'aUSDC',
-          // reserveTokenSymbol: 'WETH',
-          // description: 'aUSDC',
-          // mainLeftTopLabel: 'PAY IN',
-          // mainLeftTopValue: '0.1% fee on deposits/withdrawals',
-          // mainLeftBottomLabel: 'FOR',
-          // mainLeftBottomValue: '100% Coverage',
-          // mainRightTopLabel: 'BACKED BY',
-          // mainRightTopValue: 'USDC (Not invested)',
-          // mainRightBottomLabel: 'GOVERNED BY',
-          // mainRightBottomValue: 'DAO',
-          // bodyRisks: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock token and 2) risk that **admin keys are stolen** or used to withdraw token. Not covered: 1) Risk of a USDC collapse hack or USDC lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          // bodyCost: `**0.1% deposit/withdrawl fee** will be paid to Shield Miners.`,
-          // bodyClaims: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
-          // bodyShieldApy: `1.70%`,
-          // bodyAmountStaked: `1,500 ETH ($200k)`,
-          // bodyInvestmentStrategy: `Hodling (0% APY)`,
-          // depositsDisabled: false,
-
-          // vaultSymbol: 'paUSDC',
-          // erc20address: 'Ethereum',
-          // vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-          // vaultContractABI: config.vaultContractV4ABI,
-          // balance: 0,
-          // vaultBalance: 0,
-          // decimals: 18,
-          // deposit: true,
-          // depositAll: false,
-          // withdraw: true,
-          // withdrawAll: true,
-          // lastMeasurement: 10774489,
-          // measurement: 1e18,
-          // price_id: 'ethereum',
-        //},
       ],
       coverageHoldings: [
         {
-          protektId: 'Compound-DAI-manual-market',
+          protektId: 'TEST-market',
           protektIndex: 0,
 
           // Calculated Fields
-          amountCoveredToken: 0,
-          amountCoveredUsd: 0,
+          amountCoveredToken: 10,
+          amountCoveredUsd: 100,
           claimableRewardAmountToken: `$10`,
           claimableRewardAmountUsd: `$40`,
         }
       ],
       stakingHoldings: [
         {
-          protektId: 'Compound-DAI-manual-market',
+          protektId: 'TEST-market',
           protektIndex: 0,
 
           // Calculated Fields
@@ -374,177 +209,174 @@ class Store {
         Torus: torus,
         Authereum: authereum
       },
-      builtWith: [
-        {
-          website: 'https://DeFiZap.com',
-          logo: 'defizap.png',
-          name: 'DeFi Zap'
-        },
-        {
-          website: 'https://1inch.exchange',
-          logo: 'oneinch.svg',
-          name: '1inch'
-        },
-        {
-          website: 'https://www.defisnap.io',
-          logo: 'defisnap.svg',
-          name: 'DefiSnap'
-        },
-        {
-          website: 'https://www.defipulse.com',
-          logo: 'defipulse.png',
-          name: 'DeFi Pulse'
-        },
-        {
-          website: 'https://www.curve.fi',
-          logo: 'curvefi.jpg',
-          name: 'Curve'
-        },
-        {
-          website: 'https://bzx.network',
-          logo: 'bzx.png',
-          name: 'bZx'
-        },
-        {
-          website: 'http://aave.com',
-          logo: 'aave.png',
-          name: 'Aave'
-        },
-        {
-          website: 'https://compound.finance',
-          logo: 'compound.png',
-          name: 'Compound'
-        },
-        {
-          website: 'http://dydx.exchange',
-          logo: 'dydx.jpg',
-          name: 'dYdX'
-        },
-        {
-          website: 'https://ddex.io',
-          logo: 'ddex.jpg',
-          name: 'HydroProtocol'
-        },
-        {
-          website: 'https://lendf.me',
-          logo: 'lendf.png',
-          name: 'LendfMe'
-        },
-        {
-          website: 'https://uniswap.io',
-          logo: 'uniswap.png',
-          name: 'Uniswap'
-        },
-        {
-          website: 'http://kyber.network',
-          logo: 'kybernetwork.png',
-          name: 'KyberNetwork'
-        },
-        {
-          website: 'https://synthetix.io',
-          logo: 'synthetix.png',
-          name: 'Synthetix'
-        },
-        {
-          website: 'https://www.ethereum.org',
-          logo: 'ethereum.png',
-          name: 'ethereum'
-        },
-        {
-          website: 'https://trufflesuite.com',
-          logo: 'truffle.png',
-          name: 'Truffle Suite'
-        },
-        {
-          website: 'https://etherscan.io',
-          logo: 'etherscan.png',
-          name: 'Etherscan'
-        },
-        {
-          website: 'https://alchemyapi.io/',
-          logo: 'alchemy.png',
-          name: 'Alchemy'
-        },
-      ],
+      // builtWith: [
+      //   {
+      //     website: 'https://DeFiZap.com',
+      //     logo: 'defizap.png',
+      //     name: 'DeFi Zap'
+      //   },
+      //   {
+      //     website: 'https://1inch.exchange',
+      //     logo: 'oneinch.svg',
+      //     name: '1inch'
+      //   },
+      //   {
+      //     website: 'https://www.defisnap.io',
+      //     logo: 'defisnap.svg',
+      //     name: 'DefiSnap'
+      //   },
+      //   {
+      //     website: 'https://www.defipulse.com',
+      //     logo: 'defipulse.png',
+      //     name: 'DeFi Pulse'
+      //   },
+      //   {
+      //     website: 'https://www.curve.fi',
+      //     logo: 'curvefi.jpg',
+      //     name: 'Curve'
+      //   },
+      //   {
+      //     website: 'https://bzx.network',
+      //     logo: 'bzx.png',
+      //     name: 'bZx'
+      //   },
+      //   {
+      //     website: 'http://aave.com',
+      //     logo: 'aave.png',
+      //     name: 'Aave'
+      //   },
+      //   {
+      //     website: 'https://compound.finance',
+      //     logo: 'compound.png',
+      //     name: 'Compound'
+      //   },
+      //   {
+      //     website: 'http://dydx.exchange',
+      //     logo: 'dydx.jpg',
+      //     name: 'dYdX'
+      //   },
+      //   {
+      //     website: 'https://ddex.io',
+      //     logo: 'ddex.jpg',
+      //     name: 'HydroProtocol'
+      //   },
+      //   {
+      //     website: 'https://lendf.me',
+      //     logo: 'lendf.png',
+      //     name: 'LendfMe'
+      //   },
+      //   {
+      //     website: 'https://uniswap.io',
+      //     logo: 'uniswap.png',
+      //     name: 'Uniswap'
+      //   },
+      //   {
+      //     website: 'http://kyber.network',
+      //     logo: 'kybernetwork.png',
+      //     name: 'KyberNetwork'
+      //   },
+      //   {
+      //     website: 'https://synthetix.io',
+      //     logo: 'synthetix.png',
+      //     name: 'Synthetix'
+      //   },
+      //   {
+      //     website: 'https://www.ethereum.org',
+      //     logo: 'ethereum.png',
+      //     name: 'ethereum'
+      //   },
+      //   {
+      //     website: 'https://trufflesuite.com',
+      //     logo: 'truffle.png',
+      //     name: 'Truffle Suite'
+      //   },
+      //   {
+      //     website: 'https://etherscan.io',
+      //     logo: 'etherscan.png',
+      //     name: 'Etherscan'
+      //   },
+      //   {
+      //     website: 'https://alchemyapi.io/',
+      //     logo: 'alchemy.png',
+      //     name: 'Alchemy'
+      //   },
+      // ],
       web3context: null,
       languages: [
         {
           language: 'English',
           code: 'en'
-        },
-        {
-          language: 'Japanese',
-          code: 'ja'
-        },
-        {
-          language: 'Chinese',
-          code: 'zh'
         }
       ],
-      curvBalance: 0,
-      curveContracts: [
-        {
-          id: 'crvV1',
-          symbol: 'compound.curve.fi',
-          version: 1,
-          erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
-          decimals: 18,
-          balance: 0
-        },
-        {
-          id: 'crvV2',
-          symbol: 'usdt.curve.fi',
-          version: 2,
-          erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
-          decimals: 18,
-          balance: 0
-        },
-        {
-          id: 'crvV3',
-          symbol: 'y.curve.fi',
-          version: 3,
-          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-          decimals: 18,
-          balance: 0
-        },
-        {
-          id: 'crvV4',
-          symbol: 'busd.curve.fi',
-          version: 4,
-          erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
-          decimals: 18,
-          balance: 0
-        }
-      ],
-      insuranceAssets: [
-        {
-          id: 'oCurve.fi',
-          symbol: '$Curve.fi',
-          insuredSymbol: 'oCRV',
-          name: 'oCurve.fi',
-          description: 'yDAI/yUSDC/yUSDT/yTUSD',
-          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-          insuranceAddress: '0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B',
-          insuranceABI:  config.insuranceABI,
-          uniswapInsuranceAddress: '0x21f5e9d4ec20571402a5396084b1634314a68c97',
-          uniswapInsuranceABI: config.uniswapInsuranceABI,
-          decimals: 18,
-          insuredDecimals: 15,
-          balance: 0,
-          insuredBalance: 0,
-          apr: 0,
-          insuredApr: 0,
-          pricePerInsurance: 0,
-          tokenPrice: 0
-        }
-      ],
+      // curvBalance: 0,
+      // curveContracts: [
+      //   {
+      //     id: 'crvV1',
+      //     symbol: 'compound.curve.fi',
+      //     version: 1,
+      //     erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
+      //     decimals: 18,
+      //     balance: 0
+      //   },
+      //   {
+      //     id: 'crvV2',
+      //     symbol: 'usdt.curve.fi',
+      //     version: 2,
+      //     erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
+      //     decimals: 18,
+      //     balance: 0
+      //   },
+      //   {
+      //     id: 'crvV3',
+      //     symbol: 'y.curve.fi',
+      //     version: 3,
+      //     erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+      //     decimals: 18,
+      //     balance: 0
+      //   },
+      //   {
+      //     id: 'crvV4',
+      //     symbol: 'busd.curve.fi',
+      //     version: 4,
+      //     erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
+      //     decimals: 18,
+      //     balance: 0
+      //   }
+      // ],
+      // insuranceAssets: [
+      //   {
+      //     id: 'oCurve.fi',
+      //     symbol: '$Curve.fi',
+      //     insuredSymbol: 'oCRV',
+      //     name: 'oCurve.fi',
+      //     description: 'yDAI/yUSDC/yUSDT/yTUSD',
+      //     erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+      //     insuranceAddress: '0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B',
+      //     insuranceABI:  config.insuranceABI,
+      //     uniswapInsuranceAddress: '0x21f5e9d4ec20571402a5396084b1634314a68c97',
+      //     uniswapInsuranceABI: config.uniswapInsuranceABI,
+      //     decimals: 18,
+      //     insuredDecimals: 15,
+      //     balance: 0,
+      //     insuredBalance: 0,
+      //     apr: 0,
+      //     insuredApr: 0,
+      //     pricePerInsurance: 0,
+      //     tokenPrice: 0
+      //   }
+      // ],
       ethBalance: 0,
-      sCrvBalance:  0
+      // sCrvBalance:  0
     }
 
     dispatcher.register(
       function (payload) {
+        console.log('Dispatcher payload:', payload)
+
         switch (payload.type) {
+          case GET_PROTEKT_CONTRACT_BALANCES:
+            this.getProtektContractBalances(payload);
+            break;
           case GET_BALANCES_LIGHT:
             this.getBalancesLight(payload);
             break;
@@ -638,6 +470,7 @@ class Store {
   }
 
   _getDefaultValues = () => {
+    console.log('getDefault')
     return {
       assets: [
         {
@@ -1615,34 +1448,18 @@ class Store {
     }
   }
 
-  /*
-      I don't actuially knwo what this is approving
-
-  */
   _checkApproval = async (erc20address, account, amount, contract, callback) => {
-    console.log('\n \n \n checking approval for ASSET :')
     // console.log(asset)
     if(erc20address === 'Ethereum') {
       return callback()
     }
-    console.log('\n \n \n getting here a :')
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
-    console.log('\n \n \n getting here b :')
     try {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
-      console.log('\n \n \n getting here c :')
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
-        /*
-          code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
-          We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
-        */
-
-        // if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3', 'USDT', 'sCRV'].includes(asset.id) && ethAllowance > 0) {
-        //   await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        // }
 
         await erc20Contract.methods.approve(contract, web3.utils.toWei('999999999999', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         callback()
@@ -1775,90 +1592,90 @@ class Store {
     }
   }
 
-  rebalance = (payload) => {
-    const account = store.getStore('account')
-    const { asset } = payload.content
+  // rebalance = (payload) => {
+  //   const account = store.getStore('account')
+  //   const { asset } = payload.content
 
-    this._callRebalance(asset, account, (err, result) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
+  //   this._callRebalance(asset, account, (err, result) => {
+  //     if(err) {
+  //       return emitter.emit(ERROR, err);
+  //     }
 
-      return emitter.emit(REBALANCE_RETURNED, result)
-    })
-  }
+  //     return emitter.emit(REBALANCE_RETURNED, result)
+  //   })
+  // }
 
-  _callRebalance = async (asset, account, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+  // _callRebalance = async (asset, account, callback) => {
+  //   const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let iEarnContract = new web3.eth.Contract(config.IEarnERC20ABI, asset.iEarnContract)
+  //   let iEarnContract = new web3.eth.Contract(config.IEarnERC20ABI, asset.iEarnContract)
 
-    iEarnContract.methods.rebalance().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-    .on('transactionHash', function(hash){
-      console.log(hash)
-      callback(null, hash)
-    })
-    .on('confirmation', function(confirmationNumber, receipt){
-      console.log(confirmationNumber, receipt);
-    })
-    .on('receipt', function(receipt){
-      console.log(receipt);
-    })
-    .on('error', function(error) {
-      console.log(error);
-      if (!error.toString().includes("-32601")) {
-        if(error.message) {
-          return callback(error.message)
-        }
-        callback(error)
-      }
-    })
-  }
+  //   iEarnContract.methods.rebalance().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+  //   .on('transactionHash', function(hash){
+  //     console.log(hash)
+  //     callback(null, hash)
+  //   })
+  //   .on('confirmation', function(confirmationNumber, receipt){
+  //     console.log(confirmationNumber, receipt);
+  //   })
+  //   .on('receipt', function(receipt){
+  //     console.log(receipt);
+  //   })
+  //   .on('error', function(error) {
+  //     console.log(error);
+  //     if (!error.toString().includes("-32601")) {
+  //       if(error.message) {
+  //         return callback(error.message)
+  //       }
+  //       callback(error)
+  //     }
+  //   })
+  // }
 
-  donate = (payload) => {
-    const account = store.getStore('account')
-    const { asset, amount } = payload.content
+  // donate = (payload) => {
+  //   const account = store.getStore('account')
+  //   const { asset, amount } = payload.content
 
-    this._callDonate(asset, account, amount, (err, result) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
+  //   this._callDonate(asset, account, amount, (err, result) => {
+  //     if(err) {
+  //       return emitter.emit(ERROR, err);
+  //     }
 
-      return emitter.emit(DONATE_RETURNED, result)
-    })
-  }
+  //     return emitter.emit(DONATE_RETURNED, result)
+  //   })
+  // }
 
-  _callDonate = async (asset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+  // _callDonate = async (asset, account, amount, callback) => {
+  //   const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let iEarnContract = new web3.eth.Contract(config.IEarnERC20ABI, asset.erc20address)
+  //   let iEarnContract = new web3.eth.Contract(config.IEarnERC20ABI, asset.erc20address)
 
-    var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals !== 18) {
-      amountSend = Math.round(amount*10**asset.decimals);
-    }
+  //   var amountSend = web3.utils.toWei(amount, "ether")
+  //   if (asset.decimals !== 18) {
+  //     amountSend = Math.round(amount*10**asset.decimals);
+  //   }
 
-    iEarnContract.methods.transfer(asset.iEarnContract, amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-    .on('transactionHash', function(hash){
-      console.log(hash)
-      callback(null, hash)
-    })
-    .on('confirmation', function(confirmationNumber, receipt){
-      console.log(confirmationNumber, receipt);
-    })
-    .on('receipt', function(receipt){
-      console.log(receipt);
-    })
-    .on('error', function(error) {
-      console.log(error);
-      if (!error.toString().includes("-32601")) {
-        if(error.message) {
-          return callback(error.message)
-        }
-        callback(error)
-      }
-    })
-  }
+  //   iEarnContract.methods.transfer(asset.iEarnContract, amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+  //   .on('transactionHash', function(hash){
+  //     console.log(hash)
+  //     callback(null, hash)
+  //   })
+  //   .on('confirmation', function(confirmationNumber, receipt){
+  //     console.log(confirmationNumber, receipt);
+  //   })
+  //   .on('receipt', function(receipt){
+  //     console.log(receipt);
+  //   })
+  //   .on('error', function(error) {
+  //     console.log(error);
+  //     if (!error.toString().includes("-32601")) {
+  //       if(error.message) {
+  //         return callback(error.message)
+  //       }
+  //       callback(error)
+  //     }
+  //   })
+  // }
 
   redeem = (payload) => {
     const account = store.getStore('account')
@@ -1942,6 +1759,45 @@ class Store {
     })
   }
 
+  getProtektContractBalances = async () => {
+    const account = store.getStore('account')
+
+    const protektContracts = store.getStore('protektContracts')
+
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
+
+    async.map(protektContracts, (protektContract, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
+      ], (err, data) => {
+        protektContract.underlyingTokenBalance = data[0]
+        protektContract.pTokenBalance = data[1]
+        protektContract.reserveTokenBalance = data[2]
+        protektContract.shieldTokenBalance = data[3]
+        callback(null, protektContract)
+      })
+    }, (err, protektContracts) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ protektContracts: protektContracts })
+      return emitter.emit(BALANCES_RETURNED, protektContracts)
+    })
+  }
+
+
   getBalances = async () => {
     const account = store.getStore('account')
 
@@ -1952,8 +1808,6 @@ class Store {
     }
 
     const web3 = new Web3(store.getStore('web3context').library.provider);
-
-    
 
     async.map(assets, (asset, callback) => {
       async.parallel([
@@ -1990,7 +1844,6 @@ class Store {
   }
 
   _getERC20Balance = async (web3, erc20address, account, callback) => {
-    console.log('getting erc20 balance for : ' + erc20address)
     if(erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
@@ -2005,13 +1858,11 @@ class Store {
 
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
-        // balance = parseFloat(balance)/10**asset.decimals   // deprecated
         balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
         console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
       } catch(ex) {
-        // console.log(ex)
-        // console.log(`\n \n \n \n ********* HIT ERROR OF ERC20 WITH ASSET ${erc20address} FOR BALANC ${balance} \n \n \n \n \n \n`)
+        console.log(ex)
         return callback(ex)
       }
     }
@@ -2643,184 +2494,184 @@ class Store {
     })
   }
 
-  _callZap = async (sendAsset, receiveAsset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+  // // _callZap = async (sendAsset, receiveAsset, account, amount, callback) => {
+  // //   const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    var amountToSend = web3.utils.toWei(amount, "ether")
-    if (sendAsset.decimals !== 18) {
-      amountToSend = amount*10**sendAsset.decimals;
-    }
+  // //   var amountToSend = web3.utils.toWei(amount, "ether")
+  // //   if (sendAsset.decimals !== 18) {
+  // //     amountToSend = amount*10**sendAsset.decimals;
+  // //   }
 
-    let yCurveZapContract = null
-    if(receiveAsset.id === 'crvV3') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
-    } else if(receiveAsset.id === 'crvV4') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapV4ABI, config.yCurveZapV4Address)
-    } else if(sendAsset.id === 'crvV3') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
-    } else if(sendAsset.id === 'crvV4') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutV4ABI, config.yCurveZapOutV4Address)
-    }
-    let call = ''
+  // //   let yCurveZapContract = null
+  // //   if(receiveAsset.id === 'crvV3') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
+  // //   } else if(receiveAsset.id === 'crvV4') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapV4ABI, config.yCurveZapV4Address)
+  // //   } else if(sendAsset.id === 'crvV3') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
+  // //   } else if(sendAsset.id === 'crvV4') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutV4ABI, config.yCurveZapOutV4Address)
+  // //   }
+  // //   let call = ''
 
-    switch (sendAsset.id) {
-      case 'DAIv2':
-      case 'DAIv3':
-        call = 'depositDAI'
-        break;
-      case 'USDCv2':
-      case 'USDCv3':
-        call = 'depositUSDC'
-        break;
-      case 'USDTv2':
-      case 'USDTv3':
-        call = 'depositUSDT'
-        break;
-      case 'TUSDv2':
-        call = 'depositTUSD'
-        break;
-      case 'BUSDv3':
-        call = 'depositBUSD'
-        break;
-      case 'crvV3':
-      case 'crvV4':
-        switch (receiveAsset.id) {
-          case 'DAIv2':
-          case 'DAIv3':
-            call = 'withdrawDAI'
-            break;
-          case 'USDCv2':
-          case 'USDCv3':
-            call = 'withdrawUSDC'
-            break;
-          case 'USDTv2':
-          case 'USDTv3':
-            call = 'withdrawUSDT'
-            break;
-          case 'TUSDv2':
-            call = 'withdrawTUSD'
-            break;
-          case 'BUSDv3':
-            call = 'withdrawBUSD'
-            break;
-          default:
+  // //   switch (sendAsset.id) {
+  // //     case 'DAIv2':
+  // //     case 'DAIv3':
+  // //       call = 'depositDAI'
+  // //       break;
+  // //     case 'USDCv2':
+  // //     case 'USDCv3':
+  // //       call = 'depositUSDC'
+  // //       break;
+  // //     case 'USDTv2':
+  // //     case 'USDTv3':
+  // //       call = 'depositUSDT'
+  // //       break;
+  // //     case 'TUSDv2':
+  // //       call = 'depositTUSD'
+  // //       break;
+  // //     case 'BUSDv3':
+  // //       call = 'depositBUSD'
+  // //       break;
+  // //     case 'crvV3':
+  // //     case 'crvV4':
+  // //       switch (receiveAsset.id) {
+  // //         case 'DAIv2':
+  // //         case 'DAIv3':
+  // //           call = 'withdrawDAI'
+  // //           break;
+  // //         case 'USDCv2':
+  // //         case 'USDCv3':
+  // //           call = 'withdrawUSDC'
+  // //           break;
+  // //         case 'USDTv2':
+  // //         case 'USDTv3':
+  // //           call = 'withdrawUSDT'
+  // //           break;
+  // //         case 'TUSDv2':
+  // //           call = 'withdrawTUSD'
+  // //           break;
+  // //         case 'BUSDv3':
+  // //           call = 'withdrawBUSD'
+  // //           break;
+  // //         default:
 
-        }
-        break;
-      default:
-    }
+  // //       }
+  // //       break;
+  // //     default:
+  // //   }
 
-    yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-      .on('transactionHash', function(hash){
-        console.log(hash)
-        callback(null, hash)
-      })
-      .on('confirmation', function(confirmationNumber, receipt){
-        console.log(confirmationNumber, receipt);
-      })
-      .on('receipt', function(receipt){
-        console.log(receipt);
-      })
-      .on('error', function(error) {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-      .catch((error) => {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-  }
+  // //   yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+  // //     .on('transactionHash', function(hash){
+  // //       console.log(hash)
+  // //       callback(null, hash)
+  // //     })
+  // //     .on('confirmation', function(confirmationNumber, receipt){
+  // //       console.log(confirmationNumber, receipt);
+  // //     })
+  // //     .on('receipt', function(receipt){
+  // //       console.log(receipt);
+  // //     })
+  // //     .on('error', function(error) {
+  // //       if (!error.toString().includes("-32601")) {
+  // //         if(error.message) {
+  // //           return callback(error.message)
+  // //         }
+  // //         callback(error)
+  // //       }
+  // //     })
+  // //     .catch((error) => {
+  // //       if (!error.toString().includes("-32601")) {
+  // //         if(error.message) {
+  // //           return callback(error.message)
+  // //         }
+  // //         callback(error)
+  // //       }
+  // //     })
+  // // }
 
-  idai = (payload) => {
-    const account = store.getStore('account')
-    const { sendAsset, receiveAsset, amount } = payload.content
+  // idai = (payload) => {
+  //   const account = store.getStore('account')
+  //   const { sendAsset, receiveAsset, amount } = payload.content
 
-    this._checkApproval(sendAsset, account, amount, config.iDAIZapSwapAddress, (err) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
+  //   this._checkApproval(sendAsset, account, amount, config.iDAIZapSwapAddress, (err) => {
+  //     if(err) {
+  //       return emitter.emit(ERROR, err);
+  //     }
 
-      this._callIDAI(sendAsset, receiveAsset, account, amount, (err, zapResult) => {
-        if(err) {
-          return emitter.emit(ERROR, err);
-        }
+  //     this._callIDAI(sendAsset, receiveAsset, account, amount, (err, zapResult) => {
+  //       if(err) {
+  //         return emitter.emit(ERROR, err);
+  //       }
 
-        return emitter.emit(IDAI_RETURNED, zapResult)
-      })
-    })
-  }
+  //       return emitter.emit(IDAI_RETURNED, zapResult)
+  //     })
+  //   })
+  // }
 
-  _callIDAI = async (sendAsset, receiveAsset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+  // _callIDAI = async (sendAsset, receiveAsset, account, amount, callback) => {
+  //   const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    var amountToSend = web3.utils.toWei(amount, "ether")
-    if (sendAsset.decimals !== 18) {
-      amountToSend = amount*10**sendAsset.decimals;
-    }
+  //   var amountToSend = web3.utils.toWei(amount, "ether")
+  //   if (sendAsset.decimals !== 18) {
+  //     amountToSend = amount*10**sendAsset.decimals;
+  //   }
 
-    let call = 'swapiDAItoyDAI'
+  //   let call = 'swapiDAItoyDAI'
 
-    let iDAIZapSwapContract = new web3.eth.Contract(config.iDAIZapSwapABI, config.iDAIZapSwapAddress)
-    iDAIZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-      .on('transactionHash', function(hash){
-        console.log(hash)
-        callback(null, hash)
-      })
-      .on('confirmation', function(confirmationNumber, receipt){
-        console.log(confirmationNumber, receipt);
-      })
-      .on('receipt', function(receipt){
-        console.log(receipt);
-      })
-      .on('error', function(error) {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-      .catch((error) => {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-  }
+  //   let iDAIZapSwapContract = new web3.eth.Contract(config.iDAIZapSwapABI, config.iDAIZapSwapAddress)
+  //   iDAIZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+  //     .on('transactionHash', function(hash){
+  //       console.log(hash)
+  //       callback(null, hash)
+  //     })
+  //     .on('confirmation', function(confirmationNumber, receipt){
+  //       console.log(confirmationNumber, receipt);
+  //     })
+  //     .on('receipt', function(receipt){
+  //       console.log(receipt);
+  //     })
+  //     .on('error', function(error) {
+  //       if (!error.toString().includes("-32601")) {
+  //         if(error.message) {
+  //           return callback(error.message)
+  //         }
+  //         callback(error)
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       if (!error.toString().includes("-32601")) {
+  //         if(error.message) {
+  //           return callback(error.message)
+  //         }
+  //         callback(error)
+  //       }
+  //     })
+  // }
 
-  getCurveBalances = (payload) => {
-    const account = store.getStore('account')
+  // getCurveBalances = (payload) => {
+  //   const account = store.getStore('account')
 
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-    const curveContracts = store.getStore('curveContracts')
+  //   const web3 = new Web3(store.getStore('web3context').library.provider);
+  //   const curveContracts = store.getStore('curveContracts')
 
-    async.map(curveContracts, (curv, callback) => {
+  //   async.map(curveContracts, (curv, callback) => {
 
-      this._getERC20Balance(web3, curv, account, (err, balance) => {
-        if(err) {
-          return callback(err)
-        }
-        curv.balance = balance
+  //     this._getERC20Balance(web3, curv, account, (err, balance) => {
+  //       if(err) {
+  //         return callback(err)
+  //       }
+  //       curv.balance = balance
 
-        callback(null, curv)
-      })
-    }, (err, result) => {
+  //       callback(null, curv)
+  //     })
+  //   }, (err, result) => {
 
-      store.setStore({ curveContracts: result })
+  //     store.setStore({ curveContracts: result })
 
-      return emitter.emit(GET_CURV_BALANCE_RETURNED, result)
-    })
-  }
+  //     return emitter.emit(GET_CURV_BALANCE_RETURNED, result)
+  //   })
+  // }
 
   /*
       Now not working and need to change for new pContract
@@ -2830,8 +2681,8 @@ class Store {
     const account = store.getStore('account')
     const pContracts = store.getStore('protektContracts')
 
-    console.log('\n \n \n \n ********* GET BALANCES RUNNING \n \n \n \n \n \n')
-    console.log(pContracts)
+    // console.log('\n \n \n \n ********* GET BALANCES RUNNING \n \n \n \n \n \n')
+    // console.log(pContracts)
     
     if(!account || !account.address) {
       return false
@@ -2939,55 +2790,55 @@ class Store {
     }
   }
 
-  _getStrategy = async (web3, asset, account, callback) => {
+  // _getStrategy = async (web3, asset, account, callback) => {
 
-    if(['LINK'].includes(asset.id) ) {
-      return callback(null, {
-        strategy: '',
-        name: '',
-        holdings: 0
-      })
-    }
+  //   if(['LINK'].includes(asset.id) ) {
+  //     return callback(null, {
+  //       strategy: '',
+  //       name: '',
+  //       holdings: 0
+  //     })
+  //   }
 
-    try {
-      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-      const controllerAddress = await vaultContract.methods.controller().call({ from: account.address })
-      const controllerContract = new web3.eth.Contract(config.vaultControllerABI, controllerAddress)
+  //   try {
+  //     const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+  //     const controllerAddress = await vaultContract.methods.controller().call({ from: account.address })
+  //     const controllerContract = new web3.eth.Contract(config.vaultControllerABI, controllerAddress)
 
-      let strategyAddress = ''
-      if(['LINK', 'aLINK'].includes(asset.id)) {
-        strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
-      } else {
+  //     let strategyAddress = ''
+  //     if(['LINK', 'aLINK'].includes(asset.id)) {
+  //       strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
+  //     } else {
 
-        if(asset.erc20address === 'Ethereum') {
-          asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        }
-        strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
-      }
+  //       if(asset.erc20address === 'Ethereum') {
+  //         asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+  //       }
+  //       strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
+  //     }
 
-      const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
-      const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
-      let strategyName = 'StrategyDForceUSDC'
+  //     const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
+  //     const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
+  //     let strategyName = 'StrategyDForceUSDC'
 
-      if(!['USDC'].includes(asset.id)) {
-        strategyName = await strategyContract.methods.getName().call({ from: account.address })
-      }
+  //     if(!['USDC'].includes(asset.id)) {
+  //       strategyName = await strategyContract.methods.getName().call({ from: account.address })
+  //     }
 
-      callback(null, {
-        strategy: strategyAddress,
-        name: strategyName,
-        holdings: holdings/(10**(asset.id === 'aLINK' ? 6 : asset.decimals))
-      })
-    } catch (ex) {
-      console.log(asset)
-      console.log(ex)
-      callback(null, {
-        strategy: '',
-        name: '',
-        holdings: 0
-      })
-    }
-  }
+  //     callback(null, {
+  //       strategy: strategyAddress,
+  //       name: strategyName,
+  //       holdings: holdings/(10**(asset.id === 'aLINK' ? 6 : asset.decimals))
+  //     })
+  //   } catch (ex) {
+  //     console.log(asset)
+  //     console.log(ex)
+  //     callback(null, {
+  //       strategy: '',
+  //       name: '',
+  //       holdings: 0
+  //     })
+  //   }
+  // }
 
   _getStatsAPY = (vaultStatistics, asset, callback) => {
     try {
@@ -3160,36 +3011,9 @@ class Store {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-        
-        return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
       })
     })
   }
-
-  // depositVault = (payload) => {
-  //   const account = store.getStore('account')
-  //   const { asset, amount } = payload.content
-
-  //   console.log(`\n \n \n  hit start protection in store : asset = ${asset.id} amount = ${amount}  `)
-  //   console.log(asset)
-
-  //   this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
-  //     if(err) {
-  //       return emitter.emit(ERROR, err);
-  //     }
-  //     console.log('\n \n passed approval')
-  //     this._callDepositVault(asset, account, amount, (err, depositResult) => {
-  //       if(err) {
-  //         return emitter.emit(ERROR, err);
-  //       }
-  //       console.log('\n \n passed error on deposit')
-  //       console.log('deposit resul:')
-  //       console.log(depositResult)
-
-  //       return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
-  //     })
-  //   })
-  // }
 
   _checkIfApprovalIsNeeded = async (asset, account, amount, contract, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
@@ -3262,14 +3086,8 @@ class Store {
 
     var amountToSend = web3.utils.toWei(amount, "ether")
 
-    /* 
-        below is deprecated
-    */
-    // if (asset.decimals !== 18) {
-    //   amountToSend = amount*10**asset.decimals;
-    // }
-
     console.log(`Sending ${amountToSend} of ${erc20address} to ${vaultContractAddress}`)
+    console.log('account',account)
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -3282,6 +3100,8 @@ class Store {
         })
         .on('receipt', function(receipt){
           console.log(receipt);
+        
+          emitter.emit(DEPOSIT_VAULT_RETURNED, receipt)
         })
         .on('error', function(error) {
           if (!error.toString().includes("-32601")) {
@@ -3302,14 +3122,16 @@ class Store {
     } else {
       vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
-          console.log(hash)
+          // console.log(hash)
           callback(null, hash)
         })
         .on('confirmation', function(confirmationNumber, receipt){
-          console.log(confirmationNumber, receipt);
+          // console.log(confirmationNumber, receipt);
         })
         .on('receipt', function(receipt){
           console.log(receipt);
+
+          emitter.emit(DEPOSIT_VAULT_RETURNED, receipt.transactionHash)
         })
         .on('error', function(error) {
           if (!error.toString().includes("-32601")) {
