@@ -3015,31 +3015,6 @@ class Store {
     })
   }
 
-  // depositVault = (payload) => {
-  //   const account = store.getStore('account')
-  //   const { asset, amount } = payload.content
-
-  //   console.log(`\n \n \n  hit start protection in store : asset = ${asset.id} amount = ${amount}  `)
-  //   console.log(asset)
-
-  //   this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
-  //     if(err) {
-  //       return emitter.emit(ERROR, err);
-  //     }
-  //     console.log('\n \n passed approval')
-  //     this._callDepositVault(asset, account, amount, (err, depositResult) => {
-  //       if(err) {
-  //         return emitter.emit(ERROR, err);
-  //       }
-  //       console.log('\n \n passed error on deposit')
-  //       console.log('deposit resul:')
-  //       console.log(depositResult)
-
-  //       return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
-  //     })
-  //   })
-  // }
-
   _checkIfApprovalIsNeeded = async (asset, account, amount, contract, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
@@ -3111,14 +3086,8 @@ class Store {
 
     var amountToSend = web3.utils.toWei(amount, "ether")
 
-    /* 
-        below is deprecated
-    */
-    // if (asset.decimals !== 18) {
-    //   amountToSend = amount*10**asset.decimals;
-    // }
-
     console.log(`Sending ${amountToSend} of ${erc20address} to ${vaultContractAddress}`)
+    console.log('account',account)
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
