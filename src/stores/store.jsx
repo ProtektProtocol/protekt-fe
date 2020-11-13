@@ -3163,7 +3163,6 @@ class Store {
           console.log(receipt);
 
           emitter.emit(DEPOSIT_VAULT_RETURNED, receipt.transactionHash)
-            )
         })
         .on('error', function(error) {
           if (!error.toString().includes("-32601")) {
