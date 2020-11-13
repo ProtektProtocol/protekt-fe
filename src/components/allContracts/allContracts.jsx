@@ -399,7 +399,6 @@ class Vault extends Component {
   };
 
   showHash = (txHash) => {
-    // dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
     dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)

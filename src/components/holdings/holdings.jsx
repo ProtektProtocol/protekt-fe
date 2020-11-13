@@ -470,8 +470,6 @@ class Vault extends Component {
 
     return coverageHoldings.map((temp) => {
       let asset = { ...temp,  ...protektContracts[temp.protektIndex] } 
-      console.log('\n \n \n holdings map')
-      console.log(asset)
 
       return (
         <Accordion className={ classes.expansionPanel } square key={ asset.id+"_cover_"+"_expand" } expanded={ coverageExpanded === asset.holdingId} onChange={ () => { this.handleCoverageChange(asset.holdingId) } }>

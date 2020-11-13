@@ -1785,8 +1785,6 @@ class Store {
       return null
     }
 
-    console.log(web3)
-
     async.map(protektContracts, (protektContract, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress, account, callbackInner) },

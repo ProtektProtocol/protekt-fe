@@ -50,6 +50,7 @@ class App extends Component {
           emitter.emit(CONNECTION_CONNECTED)
         })
         .catch((e) => {
+          console.log('---here---')
           console.log(e)
         })
       } else {
