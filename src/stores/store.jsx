@@ -1775,7 +1775,6 @@ class Store {
     const account = store.getStore('account')
 
     const protektContracts = store.getStore('protektContracts')
-    // const protektContract = protektContracts[0]
 
     if(!account || !account.address) {
       return false
@@ -1795,10 +1794,6 @@ class Store {
         (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
       ], (err, data) => {
-
-        console.log('data')
-        console.log(data)
-
         protektContract.underlyingTokenBalance = data[0]
         protektContract.pTokenBalance = data[1]
         protektContract.reserveTokenBalance = data[2]
@@ -1862,7 +1857,6 @@ class Store {
   }
 
   _getERC20Balance = async (web3, erc20address, account, callback) => {
-    console.log('getting erc20 balance for : ' + erc20address)
     if(erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
@@ -1875,13 +1869,8 @@ class Store {
     } else {
       let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
 
-      console.log(erc20Contract)
-
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
-        // balance = parseFloat(balance)/10**asset.decimals   // deprecated
-        console.log('Address : ' + account.address)
-        console.log('BALANCE FOUND : ' + balance)
         balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
         console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
@@ -2519,120 +2508,120 @@ class Store {
     })
   }
 
-  _callZap = async (sendAsset, receiveAsset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+  // // _callZap = async (sendAsset, receiveAsset, account, amount, callback) => {
+  // //   const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    var amountToSend = web3.utils.toWei(amount, "ether")
-    if (sendAsset.decimals !== 18) {
-      amountToSend = amount*10**sendAsset.decimals;
-    }
+  // //   var amountToSend = web3.utils.toWei(amount, "ether")
+  // //   if (sendAsset.decimals !== 18) {
+  // //     amountToSend = amount*10**sendAsset.decimals;
+  // //   }
 
-    let yCurveZapContract = null
-    if(receiveAsset.id === 'crvV3') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
-    } else if(receiveAsset.id === 'crvV4') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapV4ABI, config.yCurveZapV4Address)
-    } else if(sendAsset.id === 'crvV3') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
-    } else if(sendAsset.id === 'crvV4') {
-      yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutV4ABI, config.yCurveZapOutV4Address)
-    }
-    let call = ''
+  // //   let yCurveZapContract = null
+  // //   if(receiveAsset.id === 'crvV3') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
+  // //   } else if(receiveAsset.id === 'crvV4') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapV4ABI, config.yCurveZapV4Address)
+  // //   } else if(sendAsset.id === 'crvV3') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
+  // //   } else if(sendAsset.id === 'crvV4') {
+  // //     yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutV4ABI, config.yCurveZapOutV4Address)
+  // //   }
+  // //   let call = ''
 
-    switch (sendAsset.id) {
-      case 'DAIv2':
-      case 'DAIv3':
-        call = 'depositDAI'
-        break;
-      case 'USDCv2':
-      case 'USDCv3':
-        call = 'depositUSDC'
-        break;
-      case 'USDTv2':
-      case 'USDTv3':
-        call = 'depositUSDT'
-        break;
-      case 'TUSDv2':
-        call = 'depositTUSD'
-        break;
-      case 'BUSDv3':
-        call = 'depositBUSD'
-        break;
-      case 'crvV3':
-      case 'crvV4':
-        switch (receiveAsset.id) {
-          case 'DAIv2':
-          case 'DAIv3':
-            call = 'withdrawDAI'
-            break;
-          case 'USDCv2':
-          case 'USDCv3':
-            call = 'withdrawUSDC'
-            break;
-          case 'USDTv2':
-          case 'USDTv3':
-            call = 'withdrawUSDT'
-            break;
-          case 'TUSDv2':
-            call = 'withdrawTUSD'
-            break;
-          case 'BUSDv3':
-            call = 'withdrawBUSD'
-            break;
-          default:
+  // //   switch (sendAsset.id) {
+  // //     case 'DAIv2':
+  // //     case 'DAIv3':
+  // //       call = 'depositDAI'
+  // //       break;
+  // //     case 'USDCv2':
+  // //     case 'USDCv3':
+  // //       call = 'depositUSDC'
+  // //       break;
+  // //     case 'USDTv2':
+  // //     case 'USDTv3':
+  // //       call = 'depositUSDT'
+  // //       break;
+  // //     case 'TUSDv2':
+  // //       call = 'depositTUSD'
+  // //       break;
+  // //     case 'BUSDv3':
+  // //       call = 'depositBUSD'
+  // //       break;
+  // //     case 'crvV3':
+  // //     case 'crvV4':
+  // //       switch (receiveAsset.id) {
+  // //         case 'DAIv2':
+  // //         case 'DAIv3':
+  // //           call = 'withdrawDAI'
+  // //           break;
+  // //         case 'USDCv2':
+  // //         case 'USDCv3':
+  // //           call = 'withdrawUSDC'
+  // //           break;
+  // //         case 'USDTv2':
+  // //         case 'USDTv3':
+  // //           call = 'withdrawUSDT'
+  // //           break;
+  // //         case 'TUSDv2':
+  // //           call = 'withdrawTUSD'
+  // //           break;
+  // //         case 'BUSDv3':
+  // //           call = 'withdrawBUSD'
+  // //           break;
+  // //         default:
 
-        }
-        break;
-      default:
-    }
+  // //       }
+  // //       break;
+  // //     default:
+  // //   }
 
-    yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-      .on('transactionHash', function(hash){
-        console.log(hash)
-        callback(null, hash)
-      })
-      .on('confirmation', function(confirmationNumber, receipt){
-        console.log(confirmationNumber, receipt);
-      })
-      .on('receipt', function(receipt){
-        console.log(receipt);
-      })
-      .on('error', function(error) {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-      .catch((error) => {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
-          }
-          callback(error)
-        }
-      })
-  }
+  // //   yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+  // //     .on('transactionHash', function(hash){
+  // //       console.log(hash)
+  // //       callback(null, hash)
+  // //     })
+  // //     .on('confirmation', function(confirmationNumber, receipt){
+  // //       console.log(confirmationNumber, receipt);
+  // //     })
+  // //     .on('receipt', function(receipt){
+  // //       console.log(receipt);
+  // //     })
+  // //     .on('error', function(error) {
+  // //       if (!error.toString().includes("-32601")) {
+  // //         if(error.message) {
+  // //           return callback(error.message)
+  // //         }
+  // //         callback(error)
+  // //       }
+  // //     })
+  // //     .catch((error) => {
+  // //       if (!error.toString().includes("-32601")) {
+  // //         if(error.message) {
+  // //           return callback(error.message)
+  // //         }
+  // //         callback(error)
+  // //       }
+  // //     })
+  // // }
 
-  idai = (payload) => {
-    const account = store.getStore('account')
-    const { sendAsset, receiveAsset, amount } = payload.content
+  // idai = (payload) => {
+  //   const account = store.getStore('account')
+  //   const { sendAsset, receiveAsset, amount } = payload.content
 
-    this._checkApproval(sendAsset, account, amount, config.iDAIZapSwapAddress, (err) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
+  //   this._checkApproval(sendAsset, account, amount, config.iDAIZapSwapAddress, (err) => {
+  //     if(err) {
+  //       return emitter.emit(ERROR, err);
+  //     }
 
-      this._callIDAI(sendAsset, receiveAsset, account, amount, (err, zapResult) => {
-        if(err) {
-          return emitter.emit(ERROR, err);
-        }
+  //     this._callIDAI(sendAsset, receiveAsset, account, amount, (err, zapResult) => {
+  //       if(err) {
+  //         return emitter.emit(ERROR, err);
+  //       }
 
-        return emitter.emit(IDAI_RETURNED, zapResult)
-      })
-    })
-  }
+  //       return emitter.emit(IDAI_RETURNED, zapResult)
+  //     })
+  //   })
+  // }
 
   _callIDAI = async (sendAsset, receiveAsset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
@@ -2674,29 +2663,29 @@ class Store {
       })
   }
 
-  getCurveBalances = (payload) => {
-    const account = store.getStore('account')
+  // getCurveBalances = (payload) => {
+  //   const account = store.getStore('account')
 
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-    const curveContracts = store.getStore('curveContracts')
+  //   const web3 = new Web3(store.getStore('web3context').library.provider);
+  //   const curveContracts = store.getStore('curveContracts')
 
-    async.map(curveContracts, (curv, callback) => {
+  //   async.map(curveContracts, (curv, callback) => {
 
-      this._getERC20Balance(web3, curv, account, (err, balance) => {
-        if(err) {
-          return callback(err)
-        }
-        curv.balance = balance
+  //     this._getERC20Balance(web3, curv, account, (err, balance) => {
+  //       if(err) {
+  //         return callback(err)
+  //       }
+  //       curv.balance = balance
 
-        callback(null, curv)
-      })
-    }, (err, result) => {
+  //       callback(null, curv)
+  //     })
+  //   }, (err, result) => {
 
-      store.setStore({ curveContracts: result })
+  //     store.setStore({ curveContracts: result })
 
-      return emitter.emit(GET_CURV_BALANCE_RETURNED, result)
-    })
-  }
+  //     return emitter.emit(GET_CURV_BALANCE_RETURNED, result)
+  //   })
+  // }
 
   /*
       Now not working and need to change for new pContract
