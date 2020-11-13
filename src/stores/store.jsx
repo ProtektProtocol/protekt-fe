@@ -3162,7 +3162,7 @@ class Store {
         .on('receipt', function(receipt){
           console.log(receipt);
 
-          emitter.emit(DEPOSIT_VAULT_RETURNED, receipt.transactionHash
+          emitter.emit(DEPOSIT_VAULT_RETURNED, receipt.transactionHash)
             )
         })
         .on('error', function(error) {
