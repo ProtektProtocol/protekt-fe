@@ -34,7 +34,9 @@ import {
   DEPOSIT_ALL_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT_RETURNED,
   CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED
+  CONNECTION_DISCONNECTED,
+  GET_PROTEKT_CONTRACT_BALANCES,
+  BALANCES_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -326,7 +328,8 @@ class Vault extends Component {
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+      // dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+      dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
     }
   }
   componentWillMount() {
@@ -335,7 +338,8 @@ class Vault extends Component {
     emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    // emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.on(BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
@@ -348,12 +352,12 @@ class Vault extends Component {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    // emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
 
   balancesReturned = (balances) => {
     this.setState({
-      assets: store.getStore('vaultAssets') ,
       loading: false
     })
   };
@@ -367,7 +371,8 @@ class Vault extends Component {
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
 
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    //dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -395,6 +400,7 @@ class Vault extends Component {
   };
 
   showHash = (txHash) => {
+    dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
     this.setState({ loading: false })
