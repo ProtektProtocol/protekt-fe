@@ -233,8 +233,8 @@ class CoverageHolding extends Component {
 
   render() {
     const { classes, asset } = this.props;
-    console.log('\n \n \n  inside coverage')
-    console.log(asset)
+    // console.log('\n \n \n  inside coverage')
+    // console.log(asset)
 
     const {
       amount,
@@ -289,7 +289,7 @@ class CoverageHolding extends Component {
               className={ classes.actionInput }
               id='amount'
               value={ amount }
-              error={ amountError }
+              error={ redeemAmountError }
               onChange={ this.onChange }
               disabled={ loading }
               placeholder="0.00"

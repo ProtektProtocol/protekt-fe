@@ -299,7 +299,7 @@ class StakingHolding extends Component {
                   className={ classes.actionInput }
                   id='amount'
                   value={ amount }
-                  error={ amountError }
+                  error={ redeemAmountError }
                   onChange={ this.onChange }
                   disabled={ loading }
                   placeholder="0.00"

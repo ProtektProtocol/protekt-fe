@@ -3211,6 +3211,10 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount, vaultContractAddress } = payload.content
 
+    /*
+        Removed below as doesn't seem to be needed?
+        Possibly may be for approval but unsure what the proxy is - ask corbin
+    */
 
     // if(asset.yVaultCheckAddress) {
     //   this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
@@ -3231,7 +3235,7 @@ class Store {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-        //return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
+        //return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult) - moved inside _callWidthdrawVault
       })
     // }
   }
