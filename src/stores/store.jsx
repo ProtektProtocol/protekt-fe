@@ -100,19 +100,19 @@ class Store {
 
           // pToken
           underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          underlyingTokenAddress: '0xFCa6Cde5b00803D25527bF24841Ef0b55a8E0882',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          pTokenAddress: '0x7AfEb22Fb90e38a153492C51C0b2493Ccb0624c9',
           pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          feeModelAddress: '0x7AfEb22Fb90e38a153492C51C0b2493Ccb0624c9',
 
           // Shield Token
           reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x7856BBb02f4d6A7FE95bb6F823bD3C34Ce5baD6f',
+          reserveTokenAddress: '0x176E24Aabe6a4BdE535A39A32F945ceE2707b4Ef',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x8Ef9221539b36EaF757F5e33e848f6d9c904b1f0',
+          shieldTokenAddress: '0x0886B7f304f488CFdbE64720BC0EB2793F36b25a',
           shieldTokenContractABI: config.vaultContractV4ABI,
           controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
@@ -1785,6 +1785,8 @@ class Store {
         protektContract.pTokenBalance = data[1]
         protektContract.reserveTokenBalance = data[2]
         protektContract.shieldTokenBalance = data[3]
+
+     
         callback(null, protektContract)
       })
     }, (err, protektContracts) => {
@@ -3207,42 +3209,49 @@ class Store {
 
   withdrawVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount } = payload.content
+    const { asset, amount, vaultContractAddress } = payload.content
 
+    /*
+        Removed below as doesn't seem to be needed?
+        Possibly may be for approval but unsure what the proxy is - ask corbin
+    */
 
-    if(asset.yVaultCheckAddress) {
-      this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
+    // if(asset.yVaultCheckAddress) {
+    //   this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
+    //     if(err) {
+    //       return emitter.emit(ERROR, err);
+    //     }
+
+    //     this._callWithdrawVaultProxy(asset, account, amount, (err, withdrawResult) => {
+    //       if(err) {
+    //         return emitter.emit(ERROR, err);
+    //       }
+
+    //       return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
+    //     })
+    //   })
+    // } else {
+      this._callWithdrawVault(account, amount, vaultContractAddress, (err, withdrawResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-
-        this._callWithdrawVaultProxy(asset, account, amount, (err, withdrawResult) => {
-          if(err) {
-            return emitter.emit(ERROR, err);
-          }
-
-          return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
-        })
+        //return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult) - moved inside _callWidthdrawVault
       })
-    } else {
-      this._callWithdrawVault(asset, account, amount, (err, withdrawResult) => {
-        if(err) {
-          return emitter.emit(ERROR, err);
-        }
-        return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
-      })
-    }
+    // }
   }
 
   _callWithdrawVaultProxy = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let yVaultCheckContract = new web3.eth.Contract(config.yVaultCheckABI, asset.yVaultCheckAddress)
+    let yVaultCheckContract = new web3.eth.Contract(config.vaultContractV4ABI, asset.pTokenAddress)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals !== 18) {
-      amountSend = Math.round(amount*10**asset.decimals);
-    }
+
+    // below uses deprecated feild from assets
+
+    // if (asset.decimals !== 18) {
+    //   amountSend = Math.round(amount*10**asset.decimals);
+    // }
 
     yVaultCheckContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
@@ -3254,6 +3263,7 @@ class Store {
     })
     .on('receipt', function(receipt){
       console.log(receipt);
+      emitter.emit(WITHDRAW_VAULT_RETURNED, receipt.transactionHash)
     })
     .on('error', function(error) {
       console.log(error);
@@ -3266,18 +3276,23 @@ class Store {
     })
   }
 
-  _callWithdrawVault = async (asset, account, amount, callback) => {
+  _callWithdrawVault = async (account, amount, vaultContractAddress, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+    let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals !== 18) {
-      amountSend = Math.round(amount*10**asset.decimals);
-    }
+    
+    // below deprecated
+
+    // if (asset.decimals !== 18) {
+    //   amountSend = Math.round(amount*10**asset.decimals);
+    // }
+
+    
 
     let functionCall = vaultContract.methods.withdraw(amountSend)
-    if(asset.erc20address === 'Ethereum') {
+    if(vaultContractAddress === 'Ethereum') {
       functionCall = vaultContract.methods.withdrawETH(amountSend)
     }
 
@@ -3291,6 +3306,9 @@ class Store {
     })
     .on('receipt', function(receipt){
       console.log(receipt);
+      console.log('\Nn \n \n HITTING RECEIPT')
+
+      emitter.emit(WITHDRAW_VAULT_RETURNED, receipt.transactionHash)
     })
     .on('error', function(error) {
       console.log(error);

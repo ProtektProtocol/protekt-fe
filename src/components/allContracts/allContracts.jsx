@@ -463,13 +463,11 @@ class Vault extends Component {
   };
 
   renderProtektBlocks = () => {
-    const { protektContracts, assets, expanded, search, hideZero, basedOn } = this.state
+    const { protektContracts, expanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
     // console.log('\n \n \n Inside protekt block')
-    // console.log('ASSETS:')
-    // console.log(assets)
     // console.log('pContracts:')
     // console.log(protektContracts)
     return protektContracts.filter((pContract) => {

@@ -233,6 +233,9 @@ class CoverageHolding extends Component {
 
   render() {
     const { classes, asset } = this.props;
+    // console.log('\n \n \n  inside coverage')
+    // console.log(asset)
+
     const {
       amount,
       amountError,
@@ -279,14 +282,14 @@ class CoverageHolding extends Component {
 
           <div>
             <div className={ classes.balances }>
-                <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.reserveTokenSymbol}</Typography>
+                <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.pTokenBalance ? (Math.floor(asset.pTokenBalance*10000)/10000).toFixed(4) : '0.0000') } { asset.pTokenSymbol}</Typography>
             </div>
             <TextField
               fullWidth
               className={ classes.actionInput }
               id='amount'
               value={ amount }
-              error={ amountError }
+              error={ redeemAmountError }
               onChange={ this.onChange }
               disabled={ loading }
               placeholder="0.00"
@@ -297,8 +300,8 @@ class CoverageHolding extends Component {
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
-              onClick={ this.onDeposit }
+              disabled={ loading || asset.pTokenBalance <= 0 || asset.depositDisabled === true }
+              onClick={ this.onWithdraw }
               fullWidth
               >
               <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Withdraw</Typography>
@@ -377,46 +380,49 @@ class CoverageHolding extends Component {
     }
   }
 
-  onDeposit = () => {
-    this.setState({ amountError: false })
+  // onDeposit = () => {
+  //   this.setState({ amountError: false })
 
-    const { amount } = this.state
-    const { asset, startLoading } = this.props
+  //   const { amount } = this.state
+  //   const { asset, startLoading } = this.props
 
-    if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
-      this.setState({ amountError: true })
-      return false
-    }
+  //   console.log('\n \n  on deposit')
+  //   console.log(asset)
 
-    this.setState({ loading: true })
-    startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
-  }
+  //   // if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
+  //   //   this.setState({ amountError: true })
+  //   //   return false
+  //   // }
 
-  onDepositAll = () => {
-    const { asset, startLoading } = this.props
+  //   // this.setState({ loading: true })
+  //   // startLoading()
+  //   // dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
+  // }
 
-    this.setState({ loading: true })
-    startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  }
+  // onDepositAll = () => {
+  //   const { asset, startLoading } = this.props
+
+  //   this.setState({ loading: true })
+  //   startLoading()
+  //   dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
+  // }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
 
-    const { asset, startLoading  } = this.props
-    let redeemAmount = this.state.redeemAmount/asset.pricePerFullShare
-    redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
+    const { asset, startLoading } = this.props
+    const amountToWithdraw = (Math.floor(this.state.amount*10000)/10000).toFixed(4);
 
-    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.vaultBalance) {
+    if(!amountToWithdraw || isNaN(amountToWithdraw) || amountToWithdraw <= 0 || amountToWithdraw > asset.pTokenBalance) {
       this.setState({ redeemAmountError: true })
       return false
     }
+  
 
     this.setState({ loading: true })
     startLoading()
 
-    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: redeemAmount, asset: asset } })
+    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: amountToWithdraw, vaultContractAddress: asset.pTokenAddress } })
   }
 
   onWithdrawAll = () => {
