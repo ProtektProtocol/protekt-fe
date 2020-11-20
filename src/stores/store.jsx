@@ -82,9 +82,9 @@ class Store {
         {
           // TEST Contract Info
           id: 'TEST-market',
-          name: 'TEST Market',
-          insuredTokenSymbol: 'TEST',
-          insuredPool: 'Test Pool',
+          name: 'Compound DAI',
+          insuredTokenSymbol: 'DAI',
+          insuredPool: 'Compound',
           logo: 'cDAI-logo', // New
           description: 'A test insurance market on top of the TEST market on TEST.',
 
