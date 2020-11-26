@@ -1775,16 +1775,24 @@ class Store {
     }
 
     async.map(protektContracts, (protektContract, callback) => {
+      // console.log('\n \n \n \n IN PROTEKT CONTRACT BALANCES ')
+      // console.log(protektContract)
+
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getWithdrawalsDisabled(web3, protektContract.shieldTokenAddress, config.shieldTokenABI, callbackInner) },
       ], (err, data) => {
         protektContract.underlyingTokenBalance = data[0]
         protektContract.pTokenBalance = data[1]
         protektContract.reserveTokenBalance = data[2]
         protektContract.shieldTokenBalance = data[3]
+        protektContract.withdrawalsDisabled = data[4]
+
+        console.log('\n \n withdrawls disabled:')
+        console.log(data[4])
 
      
         callback(null, protektContract)
@@ -1861,13 +1869,29 @@ class Store {
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
         balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
-        console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
+        //console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
         return callback(ex)
       }
     }
+  }
+
+  _getWithdrawalsDisabled = async (web3, tokenAddress, tokenABI, callback) => {
+      let shieldContract = new web3.eth.Contract(tokenABI, tokenAddress)
+      console.log('\n  \n within withdraw disabled check pause')
+      console.log(shieldContract)
+      try {
+        var paused = await shieldContract.methods.isPaused().call(); // hitting exception here
+        console.log('\n \n passed paused')
+        console.log(paused)
+        return callback(null, paused)
+      } catch(ex) {
+        console.log('\n \n HIT EXCEPTION')
+        console.log(ex)
+        return callback(ex)
+      }
   }
 
   // _getERC20Balance = async (web3, asset, account, callback) => {

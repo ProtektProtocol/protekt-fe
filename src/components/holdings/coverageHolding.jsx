@@ -233,8 +233,8 @@ class CoverageHolding extends Component {
 
   render() {
     const { classes, asset } = this.props;
-    // console.log('\n \n \n  inside coverage')
-    // console.log(asset)
+    console.log('\n \n \n  inside coverage')
+    console.log(asset)
 
     const {
       amount,
@@ -324,7 +324,7 @@ class CoverageHolding extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
+                  disabled={ loading || asset.balance <= 0 || asset.withdrawalsDisabled === true }
                   onClick={ this.onDeposit }
                   fullWidth
                   >
@@ -332,9 +332,9 @@ class CoverageHolding extends Component {
                 </Button>
               </div>
             }            
-            { asset.depositDisabled === true &&
+            { asset.withdrawalsDisabled === true &&
               <div className={classes.disabledContainer}>
-                <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
+                <Typography variant='h4'>Withdraws are currently disabled for this contract</Typography>
               </div>
             }
           </div>
@@ -380,32 +380,6 @@ class CoverageHolding extends Component {
     }
   }
 
-  // onDeposit = () => {
-  //   this.setState({ amountError: false })
-
-  //   const { amount } = this.state
-  //   const { asset, startLoading } = this.props
-
-  //   console.log('\n \n  on deposit')
-  //   console.log(asset)
-
-  //   // if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
-  //   //   this.setState({ amountError: true })
-  //   //   return false
-  //   // }
-
-  //   // this.setState({ loading: true })
-  //   // startLoading()
-  //   // dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
-  // }
-
-  // onDepositAll = () => {
-  //   const { asset, startLoading } = this.props
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  // }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
