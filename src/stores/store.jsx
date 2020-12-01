@@ -1781,7 +1781,8 @@ class Store {
         (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
+
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) }, // change to pause
 
         (callbackInner) => { this._getClaimStatus(web3, protektContract.claimsManagerAddress, account, callbackInner) },
         (callbackInner) => { this._getActivePayoutEvent(web3, protektContract.claimsManagerAddress, account, callbackInner) },
@@ -1793,12 +1794,10 @@ class Store {
         protektContract.reserveTokenBalance = data[2]
         protektContract.shieldTokenBalance = data[3]
         // space for pause - ignore data[4]
-        protektContract.claimStatus = data[5] // change to data[5] - setting it for testing
+        protektContract.claimStatus = data[5]
         protektContract.activePayoutEvent = data[6]
         protektContract.currentInvestigationPeriodEnd = data[7]
         protektContract.lastBlockMeasurement = data[8]
-        // console.log(`latest block : ${data[8]}`)
-        // console.log(`claim status : 2`)
         
         callback(null, protektContract)
       })
