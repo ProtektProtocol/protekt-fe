@@ -186,9 +186,6 @@ class ClaimsFields extends Component {
 
     return (
       <div>
-
-
-
         <div className={classes.labelValueContainer}>
           <Typography variant={ 'h5' } className={ classes.grey }>COVERAGE FOR</Typography>
           <ReactMarkdown source={asset.coverageDisplay} />

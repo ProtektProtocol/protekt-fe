@@ -233,9 +233,6 @@ class CoverageHolding extends Component {
 
   render() {
     const { classes, asset } = this.props;
-    // console.log('\n \n \n  inside coverage')
-    // console.log(asset)
-
     const {
       amount,
       amountError,
@@ -318,25 +315,72 @@ class CoverageHolding extends Component {
           <ClaimsFields asset={ asset } />
 
           <div className={ classes.transactionContainer }>
-            { !asset.depositDisabled &&
+            { 
+              /* to do
+                - figure out investigation end period check
+                - remove asset.disabled and replace with other disabling method if neded
+
+              */
+            
+            asset.claimStatus == 0 &&
               <div>
                 <Button
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
-                  onClick={ this.onDeposit }
+                  disabled={ loading }
+                  onClick={ this.submitClaim }
                   fullWidth
                   >
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Submit Claim</Typography>
                 </Button>
               </div>
             }            
-            { asset.depositDisabled === true &&
-              <div className={classes.disabledContainer}>
-                <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
+            { 
+            
+              (asset.claimStatus == 1 ) &&
+              <div>
+                <Button
+                  className={ classes.actionButton }
+                  variant="outlined"
+                  color="primary"
+                  disabled={ loading || asset.lastBlockMeasurement <= asset.currentInvestigationPeriodEnd }
+                  onClick={ this.payoutClaim }
+                  fullWidth
+                  >
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Payout Claim</Typography>
+                </Button>
               </div>
-            }
+            }  
+             { 
+              (asset.claimStatus == 1 && asset.activePayoutEvent === false && asset.lastBlockMeasurement <= asset.currentInvestigationPeriodEnd) &&
+              <div>
+                <Button
+                  className={ classes.actionButton }
+                  variant="outlined"
+                  color="primary"
+                  disabled={ loading }
+                  onClick={ this.resetClaim }
+                  fullWidth
+                  >
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Reset Claim</Typography>
+                </Button>
+              </div>
+            }    
+            { asset.claimStatus == 2 &&
+              <div>
+                <Button
+                  className={ classes.actionButton }
+                  variant="outlined"
+                  color="primary"
+                  disabled={ loading }
+                  onClick={ this.resetClaim }
+                  fullWidth
+                  >
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Reset Claim</Typography>
+                </Button>
+              </div>
+            } 
           </div>
 
         </div>
@@ -344,6 +388,18 @@ class CoverageHolding extends Component {
       </div>
     )
   };
+
+  submitClaim = () => {
+    console.log('claim submitted')
+  }
+
+  payoutClaim = () => {
+    console.log('claim paid out')
+  }
+
+  resetClaim = () => {
+    console.log('claim reset')
+  }
 
   _getAPY = (asset) => {
     const { basedOn } = this.props
