@@ -241,8 +241,8 @@ class StakingHolding extends Component {
       loading
     } = this.state
 
-    console.log('\n \n \n inside staking holdings')
-    console.log(asset)
+    // console.log('\n \n \n inside staking holdings')
+    // console.log(asset)
 
     return (
       <div className={ classes.vaultContainer }>
@@ -310,7 +310,7 @@ class StakingHolding extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.shieldTokenBalance <= 0 || asset.depositDisabled === true }
+                  disabled={ loading || asset.shieldTokenBalance <= 0 || asset.withdrawalsDisabled === true }
                   onClick={ this.onWithdraw }
                   fullWidth
                   >
@@ -318,9 +318,9 @@ class StakingHolding extends Component {
                 </Button>
               </div>
             }            
-            { asset.depositDisabled === true &&
+            { asset.withdrawalsDisabled === true &&
               <div className={classes.disabledContainer}>
-                <Typography variant='h4'>Deposits are currently disabled for this contract</Typography>
+                <Typography variant='h4'>Withdraws are currently disabled for this contract</Typography>
               </div>
             }
           </div>

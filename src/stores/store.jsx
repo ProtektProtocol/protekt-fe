@@ -100,19 +100,19 @@ class Store {
 
           // pToken
           underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0xFCa6Cde5b00803D25527bF24841Ef0b55a8E0882',
+          underlyingTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0x7AfEb22Fb90e38a153492C51C0b2493Ccb0624c9',
+          pTokenAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
           pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0x7AfEb22Fb90e38a153492C51C0b2493Ccb0624c9',
+          feeModelAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
 
           // Shield Token
           reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x176E24Aabe6a4BdE535A39A32F945ceE2707b4Ef',
+          reserveTokenAddress: '0x7856BBb02f4d6A7FE95bb6F823bD3C34Ce5baD6f',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x0886B7f304f488CFdbE64720BC0EB2793F36b25a',
+          shieldTokenAddress: '0x8Ef9221539b36EaF757F5e33e848f6d9c904b1f0',
           shieldTokenContractABI: config.vaultContractV4ABI,
           controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
@@ -1776,24 +1776,25 @@ class Store {
     }
 
     async.map(protektContracts, (protektContract, callback) => {
+      // console.log('\n \n \n \n IN PROTEKT CONTRACT BALANCES ')
+      // console.log(protektContract)
+
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
-
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) }, // change to pause
-
+        (callbackInner) => { this._getWithdrawalsDisabled(web3, protektContract.shieldTokenAddress, config.shieldTokenABI, callbackInner) },
         (callbackInner) => { this._getClaimStatus(web3, protektContract.claimsManagerAddress, account, callbackInner) },
         (callbackInner) => { this._getActivePayoutEvent(web3, protektContract.claimsManagerAddress, account, callbackInner) },
         (callbackInner) => { this._getCurrentInvestigationEndPeriod(web3, protektContract.claimsManagerAddress, account, callbackInner) },
-        (callbackInner) => { this._getLatestBlockNumber(web3, callbackInner) },
+        (callbackInner) => { this._getLatestBlockNumber(web3, callbackInner) }
       ], (err, data) => {
         protektContract.underlyingTokenBalance = data[0]
         protektContract.pTokenBalance = data[1]
         protektContract.reserveTokenBalance = data[2]
         protektContract.shieldTokenBalance = data[3]
-        // space for pause - ignore data[4]
+        protektContract.withdrawalsDisabled = data[4]
         protektContract.claimStatus = data[5]
         protektContract.activePayoutEvent = data[6]
         protektContract.currentInvestigationPeriodEnd = data[7]
@@ -1917,13 +1918,29 @@ class Store {
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
         balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
-        console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
+        //console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
         return callback(ex)
       }
     }
+  }
+
+  _getWithdrawalsDisabled = async (web3, tokenAddress, tokenABI, callback) => {
+      let shieldContract = new web3.eth.Contract(tokenABI, tokenAddress)
+      console.log('\n  \n within withdraw disabled check pause')
+      console.log(shieldContract)
+      try {
+        var paused = await shieldContract.methods.isPaused().call(); // hitting exception here
+        console.log('\n \n passed paused')
+        console.log(paused)
+        return callback(null, paused)
+      } catch(ex) {
+        console.log('\n \n HIT EXCEPTION')
+        console.log(ex)
+        return callback(ex)
+      }
   }
 
   // _getERC20Balance = async (web3, asset, account, callback) => {
