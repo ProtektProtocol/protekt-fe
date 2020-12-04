@@ -100,19 +100,19 @@ class Store {
 
           // pToken
           underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0xFCa6Cde5b00803D25527bF24841Ef0b55a8E0882',
+          underlyingTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0x7AfEb22Fb90e38a153492C51C0b2493Ccb0624c9',
+          pTokenAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
           pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0x7AfEb22Fb90e38a153492C51C0b2493Ccb0624c9',
+          feeModelAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
 
           // Shield Token
           reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x176E24Aabe6a4BdE535A39A32F945ceE2707b4Ef',
+          reserveTokenAddress: '0x7856BBb02f4d6A7FE95bb6F823bD3C34Ce5baD6f',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x0886B7f304f488CFdbE64720BC0EB2793F36b25a',
+          shieldTokenAddress: '0x8Ef9221539b36EaF757F5e33e848f6d9c904b1f0',
           shieldTokenContractABI: config.vaultContractV4ABI,
           controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
