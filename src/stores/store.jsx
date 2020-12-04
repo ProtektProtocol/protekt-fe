@@ -3,27 +3,17 @@ import async from 'async';
 import {
   ERROR,
   GET_PROTEKT_CONTRACT_BALANCES,
-  GET_BALANCES,
+
   BALANCES_RETURNED,
-  BALANCES_LIGHT_RETURNED,
-  GET_VAULT_BALANCES_FULL,
-  VAULT_BALANCES_FULL_RETURNED,
-  INVEST,
-  INVEST_RETURNED,
-  REDEEM,
-  REDEEM_RETURNED,
-  REBALANCE,
-  REBALANCE_RETURNED,
-  DONATE,
-  DONATE_RETURNED,
-  GET_AGGREGATED_YIELD,
-  GET_AGGREGATED_YIELD_RETURNED,
+  GET_BALANCES,
+
+  GET_USD_PRICE,
+  USD_PRICE_RETURNED,
+  GET_BEST_PRICE_RETURNED,
   GET_CONTRACT_EVENTS,
   GET_CONTRACT_EVENTS_RETURNED,
-  GET_BEST_PRICE,
-  GET_BEST_PRICE_RETURNED,
-  GET_VAULT_BALANCES,
-  VAULT_BALANCES_RETURNED,
+
+
   DEPOSIT_VAULT,
   DEPOSIT_VAULT_RETURNED,
   DEPOSIT_ALL_VAULT,
@@ -32,7 +22,18 @@ import {
   WITHDRAW_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT,
   WITHDRAW_ALL_VAULT_RETURNED,
-  USD_PRICE_RETURNED,
+
+  // GET_VAULT_BALANCES_FULL,
+  // VAULT_BALANCES_FULL_RETURNED,
+  // GET_AGGREGATED_YIELD,
+  // GET_AGGREGATED_YIELD_RETURNED,
+
+  // GET_BEST_PRICE,
+  // GET_BEST_PRICE_RETURNED,
+  // GET_VAULT_BALANCES,
+  // VAULT_BALANCES_RETURNED,
+
+
 } from '../constants';
 import Web3 from 'web3';
 
@@ -70,9 +71,8 @@ class Store {
           name: 'Compound DAI',
           insuredTokenSymbol: 'DAI',
           insuredPool: 'Compound',
-          logo: 'cDAI-logo', // New
+          logo: 'cDAI-logo',
           description: 'A test insurance market on top of the TEST market on TEST.',
-
 
           // Display fields
           costSummaryDisplay: ' 20% COMP',
@@ -217,15 +217,6 @@ class Store {
             break;
           case GET_CONTRACT_EVENTS:
             this.getContractEvents(payload)
-            break;
-          case GET_BEST_PRICE:
-            this.getBestPrice(payload)
-            break;
-          case GET_VAULT_BALANCES:
-            this.getVaultBalances(payload);
-            break;
-          case GET_VAULT_BALANCES_FULL:
-            this.getVaultBalancesFull(payload);
             break;
           case DEPOSIT_VAULT:
             this.depositVault(payload)
@@ -1215,7 +1206,6 @@ class Store {
   }
 
   _checkApproval = async (erc20address, account, amount, contract, callback) => {
-    // console.log(asset)
     if(erc20address === 'Ethereum') {
       return callback()
     }
@@ -1398,7 +1388,6 @@ class Store {
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
         balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
-        //console.log('BALANCE FOUND : ' + balance + ' for ' + erc20address)
         return callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
@@ -1409,16 +1398,10 @@ class Store {
 
   _getWithdrawalsDisabled = async (web3, tokenAddress, tokenABI, callback) => {
       let shieldContract = new web3.eth.Contract(tokenABI, tokenAddress)
-      console.log('\n  \n within withdraw disabled check pause')
-      console.log(shieldContract)
       try {
         var paused = await shieldContract.methods.paused().call(); // hitting exception here
-        console.log('\n \n passed paused')
-        console.log(paused)
         return callback(null, paused)
       } catch(ex) {
-        console.log('\n \n HIT EXCEPTION')
-        console.log(ex)
         return callback(ex)
       }
   }
@@ -1549,100 +1532,6 @@ class Store {
     // let tx = await ethersWallet.sendTransaction(transaction);
     let tx = await web3.eth.sendTransaction(transaction)
     console.log(tx);
-  }
-
-  getVaultBalancesFull = async () => {
-    const account = store.getStore('account')
-    const pContracts = store.getStore('protektContracts')
-
-    // console.log('\n \n \n \n ********* GET BALANCES RUNNING \n \n \n \n \n \n')
-    // console.log(pContracts)
-    
-    if(!account || !account.address) {
-      return false
-    }
-
-    const web3 = await this._getWeb3Provider()
-    // web3.eth.net.getId()
-    //   .then(console.log);
-
-    //   web3.eth.net.getNetworkType()
-    //   .then(console.log);
-    //
-
-    if(!web3) {
-      return null
-    }
-
-    // var MyContract = new web3.eth.Contract(config.vaultContractV2ABI, '0x4162F62BAf5cEd4C6cbECe7e547d2aAa89949D4f', {
-    //   from: '0x2E380738810a2CFF254944A2b4aA90Cc1F35e7B0', // default from address
-    //   gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
-    // });
-
-    // MyContract.methods.balanceOf('0x2E380738810a2CFF254944A2b4aA90Cc1F35e7B0').call()
-    //   .then(function(result){
-    //   //the result holds your Token Balance that you can assign to a var
-    //   var myTokenBalance = result;
-    //   console.log('token balance :' + myTokenBalance)
-    //   return result;
-    // });
-
-    // const vaultStatistics = await this._getStatistics()
-    // const addressStatistics = await this._getAddressStatistics(account.address)
-    // const addressTXHitory = await this._getAddressTxHistory(account.address)
-
-    // const usdPrices = await this._getUSDPrices()
-
-
-    async.map(pContracts, (pContract, callback) => {
-      console.log(pContract)
-      async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, pContract.underlyingTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, pContract.reserveTokenAddress, account, callbackInner) },
-        // (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
-        // (callbackInner) => { this._getStrategy(web3, asset, account, callbackInner) },
-        // (callbackInner) => { this._getStatsAPY(vaultStatistics, asset, callbackInner) },
-        // (callbackInner) => { this._getVaultHoldings(web3, asset, account, callbackInner) },
-        // (callbackInner) => { this._getAssetUSDPrices(web3, asset, account, usdPrices, callbackInner) },
-        // (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) },
-        // (callbackInner) => { this._getAddressStats(addressStatistics, asset, callbackInner) },
-        // (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
-      ], (err, data) => {
-        if(err) {
-          console.log('\n \n \n \n ********* HIT ERR OF ASSETS \n \n \n \n \n \n')
-          return callback(err)
-        }
-        console.log()
-        pContract.underlyingTokenBalance = data[0]
-        pContract.reserveTokenBalance = data[1]
-        console.log(`underlying balance : ${data[0]} reserve balance: ${data[1]}`)
-        // asset.vaultBalance = data[1]
-        // asset.strategy = data[2].strategy
-        // asset.strategyHoldings = data[2].holdings
-        // asset.strategyName = data[2].name
-        // asset.stats = data[3]
-        // asset.vaultHoldings = data[4]
-        // asset.pricePerFullShare = data[5].pricePerFullShare
-        // asset.usdPrice = data[5].usdPrice
-        // asset.pricePerFullShare = data[6].pricePerFullShare
-        // asset.apy = data[6].apy
-        // asset.addressStatistics = data[7]
-        // asset.addressTransactions = data[8]
-
-        callback(null, pContract)
-      })
-    }, (err, pContracts) => {
-      console.log('\n \n \n \n ********* HIT end of async \n \n \n \n \n \n')
-      // console.log(pContracts)
-      if(err) {
-        console.log('\n \n \n \n ********* HIT ERROR \n \n \n \n \n \n')
-        console.log(err)
-        return emitter.emit(ERROR, err)
-      }
-      console.log(pContracts)
-      store.setStore({ protektContracts: pContracts })
-      return emitter.emit(VAULT_BALANCES_FULL_RETURNED, pContracts)
-    })
   }
 
   _getAssetUSDPrices = async (web3, asset, account, usdPrices, callback) => {

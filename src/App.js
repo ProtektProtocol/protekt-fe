@@ -13,7 +13,6 @@ import './i18n';
 import interestTheme from './theme';
 
 import Footer from './components/footer';
-import Home from './components/home';
 import Header from './components/header';
 import AllContracts from './components/allContracts';
 import Holdings from './components/holdings';
