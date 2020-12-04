@@ -116,7 +116,7 @@ class Store {
           shieldTokenContractABI: config.vaultContractV4ABI,
           controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
-          claimsManagerAddress: '0x73edc408d780A5073beC50488923859f01aB0785',
+          claimsManagerAddress: '0x4719E1016023521F9f06Dd6389807CBDaF686705',
 
 
           // Calculated Fields
@@ -132,7 +132,7 @@ class Store {
           depositsDisabled: false,
           withdrawalsDisabled: false,
           claimableRewardsDisabled: false,
-          lastMeasurement: 10774489,
+          lastBlockMeasurement: 10774489,
 
           // Claims Fields
           claimStatus: 'Active',
@@ -1677,6 +1677,7 @@ class Store {
   //   })
   // }
 
+
   redeem = (payload) => {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
@@ -1780,13 +1781,24 @@ class Store {
         (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
         (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
+
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) }, // change to pause
+
+        (callbackInner) => { this._getClaimStatus(web3, protektContract.claimsManagerAddress, account, callbackInner) },
+        (callbackInner) => { this._getActivePayoutEvent(web3, protektContract.claimsManagerAddress, account, callbackInner) },
+        (callbackInner) => { this._getCurrentInvestigationEndPeriod(web3, protektContract.claimsManagerAddress, account, callbackInner) },
+        (callbackInner) => { this._getLatestBlockNumber(web3, callbackInner) },
       ], (err, data) => {
         protektContract.underlyingTokenBalance = data[0]
         protektContract.pTokenBalance = data[1]
         protektContract.reserveTokenBalance = data[2]
         protektContract.shieldTokenBalance = data[3]
-
-     
+        // space for pause - ignore data[4]
+        protektContract.claimStatus = data[5]
+        protektContract.activePayoutEvent = data[6]
+        protektContract.currentInvestigationPeriodEnd = data[7]
+        protektContract.lastBlockMeasurement = data[8]
+        
         callback(null, protektContract)
       })
     }, (err, protektContracts) => {
@@ -1797,6 +1809,50 @@ class Store {
       store.setStore({ protektContracts: protektContracts })
       return emitter.emit(BALANCES_RETURNED, protektContracts)
     })
+  }
+
+  _getClaimStatus = async (web3, tokenAddress, account, callback) => {
+    let claimsManagerContract = new web3.eth.Contract(config.claimsManagerCoreABI, tokenAddress)
+    try {
+      var claimsStatus= await claimsManagerContract.methods.status().call();
+      return callback(null, claimsStatus)
+    } catch(ex) {
+      console.log(ex)
+      return callback(ex)
+    }
+  }
+
+  _getActivePayoutEvent = async (web3, tokenAddress, account, callback) => {
+    let claimsManagerContract = new web3.eth.Contract(config.claimsManagerCoreABI, tokenAddress)
+    try {
+      var activePayoutEvent = await claimsManagerContract.methods.activePayoutEvent().call();
+      return callback(null, activePayoutEvent)
+    } catch(ex) {
+      console.log(ex)
+      return callback(ex)
+    }
+  }
+
+  _getCurrentInvestigationEndPeriod = async (web3, tokenAddress, account, callback) => {
+    let claimsManagerContract = new web3.eth.Contract(config.claimsManagerCoreABI, tokenAddress)
+    try {
+      var currentInvestigationPeriodEnd = await claimsManagerContract.methods.currentInvestigationPeriodEnd().call();
+      return callback(null, currentInvestigationPeriodEnd)
+    } catch(ex) {
+      console.log(ex)
+      return callback(ex)
+    }
+  }
+
+  _getLatestBlockNumber = async (web3, callback) => {
+    try{
+      let block = await web3.eth.getBlockNumber();
+      return callback(null,block)
+    }catch(ex){
+      console.log(ex)
+      return callback(ex)
+    }
+    
   }
 
 
