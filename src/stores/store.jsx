@@ -88,15 +88,16 @@ class Store {
           logo: 'cDAI-logo', // New
           description: 'A test insurance market on top of the TEST market on TEST.',
 
+
           // Display fields
           costSummaryDisplay: ' 20% COMP',
           coverageSummaryDisplay: '100% Coverage',
           strategySummaryDisplay: 'ETH (Not invested)',
-          claimManagerSummaryDisplay: 'Flipping a coin',
+          claimManagerSummaryDisplay: 'DAO vote',
           costDisplay: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
           coverageDisplay: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
           strategyDisplay: 'Hodling (0% APY)',
-          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote [governing this contract](https://etherscan.io/).`,
+          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote.`,
 
           // pToken
           underlyingTokenSymbol: 'TESTU',
@@ -116,8 +117,7 @@ class Store {
           shieldTokenContractABI: config.vaultContractV4ABI,
           controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
-          claimsManagerAddress: '0x4719E1016023521F9f06Dd6389807CBDaF686705',
-
+          claimsManagerAddress: '0x73edc408d780A5073beC50488923859f01aB0785',
 
           // Calculated Fields
           underlyingTokenBalance: 0,
@@ -1932,7 +1932,7 @@ class Store {
       console.log('\n  \n within withdraw disabled check pause')
       console.log(shieldContract)
       try {
-        var paused = await shieldContract.methods.isPaused().call(); // hitting exception here
+        var paused = await shieldContract.methods.paused().call(); // hitting exception here
         console.log('\n \n passed paused')
         console.log(paused)
         return callback(null, paused)
