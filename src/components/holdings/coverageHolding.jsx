@@ -233,6 +233,7 @@ class CoverageHolding extends Component {
 
   render() {
     const { classes, asset } = this.props;
+
     const {
       amount,
       amountError,
@@ -315,72 +316,25 @@ class CoverageHolding extends Component {
           <ClaimsFields asset={ asset } />
 
           <div className={ classes.transactionContainer }>
-            { 
-              /* to do
-                - figure out investigation end period check
-                - remove asset.disabled and replace with other disabling method if neded
-
-              */
-            
-            asset.claimStatus == 0 &&
+            { !asset.depositDisabled &&
               <div>
                 <Button
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading }
-                  onClick={ this.submitClaim }
+                  disabled={ loading || asset.balance <= 0 || asset.withdrawalsDisabled === true }
+                  onClick={ this.onDeposit }
                   fullWidth
                   >
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Submit Claim</Typography>
                 </Button>
               </div>
             }            
-            { 
-            
-              (asset.claimStatus == 1 ) &&
-              <div>
-                <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
-                  disabled={ loading || asset.lastBlockMeasurement <= asset.currentInvestigationPeriodEnd }
-                  onClick={ this.payoutClaim }
-                  fullWidth
-                  >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Payout Claim</Typography>
-                </Button>
+            { asset.withdrawalsDisabled === true &&
+              <div className={classes.disabledContainer}>
+                <Typography variant='h4'>Withdraws are currently disabled for this contract</Typography>
               </div>
-            }  
-             { 
-              (asset.claimStatus == 1 && asset.activePayoutEvent === false && asset.lastBlockMeasurement <= asset.currentInvestigationPeriodEnd) &&
-              <div>
-                <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
-                  disabled={ loading }
-                  onClick={ this.resetClaim }
-                  fullWidth
-                  >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Reset Claim</Typography>
-                </Button>
-              </div>
-            }    
-            { asset.claimStatus == 2 &&
-              <div>
-                <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
-                  disabled={ loading }
-                  onClick={ this.resetClaim }
-                  fullWidth
-                  >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Reset Claim</Typography>
-                </Button>
-              </div>
-            } 
+            }
           </div>
 
         </div>
@@ -388,18 +342,6 @@ class CoverageHolding extends Component {
       </div>
     )
   };
-
-  submitClaim = () => {
-    console.log('claim submitted')
-  }
-
-  payoutClaim = () => {
-    console.log('claim paid out')
-  }
-
-  resetClaim = () => {
-    console.log('claim reset')
-  }
 
   _getAPY = (asset) => {
     const { basedOn } = this.props
@@ -436,32 +378,6 @@ class CoverageHolding extends Component {
     }
   }
 
-  // onDeposit = () => {
-  //   this.setState({ amountError: false })
-
-  //   const { amount } = this.state
-  //   const { asset, startLoading } = this.props
-
-  //   console.log('\n \n  on deposit')
-  //   console.log(asset)
-
-  //   // if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
-  //   //   this.setState({ amountError: true })
-  //   //   return false
-  //   // }
-
-  //   // this.setState({ loading: true })
-  //   // startLoading()
-  //   // dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
-  // }
-
-  // onDepositAll = () => {
-  //   const { asset, startLoading } = this.props
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  // }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
