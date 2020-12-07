@@ -12,12 +12,6 @@ import SecurityIcon from '@material-ui/icons/Security';
 import DescriptionIcon from '@material-ui/icons/Description';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 
-import ForumIcon from '@material-ui/icons/Forum';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import BuildIcon from '@material-ui/icons/Build';
-
-import BuiltWithModal from '../builtwith/builtwithModal.jsx'
-
 const styles = theme => ({
   footer: {
     padding: '24px',
@@ -100,7 +94,6 @@ class Footer extends Component {
     super()
 
     this.state = {
-      modalBuiltWithOpen: false,
     }
   }
 
@@ -136,23 +129,8 @@ class Footer extends Component {
             <Typography variant={ 'h4'} >Github</Typography>
           </div>
         </div>
-        { modalBuiltWithOpen && this.renderBuiltWithModal() }
       </div>
     )
-  }
-
-  renderBuiltWithModal = () => {
-    return (
-      <BuiltWithModal closeModal={ this.closeBuiltWithModal } modalOpen={ this.state.modalBuiltWithOpen } />
-    )
-  }
-
-  builtWithOverlayClicked = () => {
-    this.setState({ modalBuiltWithOpen: true })
-  }
-
-  closeBuiltWithModal = () => {
-    this.setState({ modalBuiltWithOpen: false })
   }
 }
 

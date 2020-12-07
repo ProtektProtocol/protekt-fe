@@ -12,20 +12,10 @@ import HttpsRedirect from 'react-https-redirect'
 import './i18n';
 import interestTheme from './theme';
 
-import APR from './components/apr';
-import InvestSimple from './components/investSimple';
-import Manage from './components/manage';
-import Performance from './components/performance';
-import Zap from './components/zap';
-import IDai from './components/idai';
 import Footer from './components/footer';
-import Home from './components/home';
 import Header from './components/header';
-import Vaults from './components/vault';
 import AllContracts from './components/allContracts';
 import Holdings from './components/holdings';
-import Dashboard from './components/dashboard';
-import HowItWorks from './components/howItWorks';
 
 import { injected } from "./stores/connectors";
 
