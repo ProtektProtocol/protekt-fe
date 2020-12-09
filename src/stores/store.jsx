@@ -1,6 +1,10 @@
 import config from "../config";
 import async from 'async';
 import {
+  COVERAGE_HOLDINGS_RETURNED,
+  STAKING_HOLDINGS_RETURNED,
+  GET_COVERAGE_HOLDINGS,
+  GET_STAKING_HOLDINGS,
   ERROR,
   GET_PROTEKT_CONTRACT_BALANCES,
 
@@ -86,23 +90,23 @@ class Store {
 
           // pToken
           underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          underlyingTokenAddress: '0x8B231B9994c21b454820fF2F0F6Ee71F69901ADE',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          pTokenAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
           pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          feeModelAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
 
           // Shield Token
           reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x7856BBb02f4d6A7FE95bb6F823bD3C34Ce5baD6f',
+          reserveTokenAddress: '0x0d9c8D17d2e9e62CdB1F641348A9E7d8450B4c65',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x8Ef9221539b36EaF757F5e33e848f6d9c904b1f0',
+          shieldTokenAddress: '0x72Dd0481BB794dd44F6ae9afCe08250e253Eb5D4',
           shieldTokenContractABI: config.vaultContractV4ABI,
-          controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
+          controllerAddress: '0x7f73Ae1162E167FBD3A7B117ED7F15344a604578',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
-          claimsManagerAddress: '0x73edc408d780A5073beC50488923859f01aB0785',
+          claimsManagerAddress: '0x067c6d278d0F544ACe67a1CEdf9e99c0024A5677',
 
           // Calculated Fields
           underlyingTokenBalance: 0,
@@ -140,28 +144,10 @@ class Store {
         },
       ],
       coverageHoldings: [
-        {
-          protektId: 'TEST-market',
-          protektIndex: 0,
-
-          // Calculated Fields
-          amountCoveredToken: 10,
-          amountCoveredUsd: 100,
-          claimableRewardAmountToken: `$10`,
-          claimableRewardAmountUsd: `$40`,
-        }
+      
       ],
       stakingHoldings: [
-        {
-          protektId: 'TEST-market',
-          protektIndex: 0,
-
-          // Calculated Fields
-          amountStakedToken: 10,
-          amountStakedUsd: 4000,
-          claimableRewardAmountToken: `$10`,
-          claimableRewardAmountUsd: `$40`,
-        }
+    
       ],
       statistics: [],
       universalGasPrice: '70',
@@ -209,6 +195,12 @@ class Store {
         console.log('Dispatcher payload:', payload)
 
         switch (payload.type) {
+          case GET_COVERAGE_HOLDINGS:
+            this.getCoverageHoldings(payload);
+            break;
+          case GET_STAKING_HOLDINGS:
+            this.getStakingHoldings(payload);
+            break;
           case GET_PROTEKT_CONTRACT_BALANCES:
             this.getProtektContractBalances(payload);
             break;
@@ -1326,6 +1318,115 @@ class Store {
       store.setStore({ protektContracts: protektContracts })
       return emitter.emit(BALANCES_RETURNED, protektContracts)
     })
+  }
+
+  getCoverageHoldings = async () => {
+    const account = store.getStore('account')
+    const protektContracts = store.getStore('protektContracts')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
+
+    async.times(protektContracts.length, (index, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getTokenUSDPrice(web3, protektContracts[index].pTokenAddress, protektContracts[index].pTokenContractABI, account, callbackInner) },
+      ], (err, data) => {
+         // not sure if have to check if tokenUSD price or ETH balance hit an error here
+        if(data[0] > 0){
+          let coverageHolding= {
+            protektId: protektContracts[index].id,
+            protektIndex: index,
+            amountCoveredToken: data[0],
+            amountCoveredUsd: '$' + (data[0] * data[1]),
+            claimableRewardAmountToken: `10`, 
+            claimableRewardAmountUsd: `$40`,
+          }
+          callback(null, coverageHolding)
+        }else{
+          callback()
+        }
+        
+      })
+    }, (err, coverageHoldings) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+      store.setStore({ coverageHoldings: coverageHoldings })
+      return emitter.emit(COVERAGE_HOLDINGS_RETURNED, coverageHoldings)
+    })
+  }
+
+  getStakingHoldings = async () => {
+    const account = store.getStore('account')
+    const protektContracts = store.getStore('protektContracts')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
+
+    async.times(protektContracts.length, (index, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getTokenUSDPrice(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenContractABI, account, callbackInner) },
+      ], (err, data) => {
+        // not sure if have to check if tokenUSD price or ETH balance hit an error here
+        if(data[0] > 0){
+          let stakingHolding= {
+            protektId: protektContracts[index].id,
+            protektIndex: index,
+            // Calculated Fields
+            amountStakedToken: data[0],
+            amountStakedUsd: '$' + (data[0] * data[1]),
+            claimableRewardAmountToken: `10`, 
+            claimableRewardAmountUsd: `$40`,
+          }
+          callback(null, stakingHolding)
+        }else{
+          callback()
+        }
+        
+      })
+    }, (err, stakingHoldings) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+      store.setStore({ stakingHoldings: stakingHoldings })
+      return emitter.emit(STAKING_HOLDINGS_RETURNED, stakingHoldings)
+    })
+  }
+
+  /*
+      Need to pass in token ID here and add that to coin gecko search instead of dai
+      - will this always be the tokens passed in ID? eg reserve/underlying from protekt?
+  */
+  _getTokenUSDPrice = async (web3, tokenAddress, tokenABI, account , callback) => {
+    try {
+      let tokenId = "dai" // pass this in
+      const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress)
+      const pricePerFullShare = await tokenContract.methods.getPricePerFullShare().call({ from: account.address })
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd,eth`
+      const priceString = await rp(url);
+      const priceJSON = JSON.parse(priceString)
+      const priceInUsd = (pricePerFullShare/1e18) * priceJSON[tokenId]['usd']
+
+      callback(null, priceInUsd)
+
+    } catch (ex) {
+      console.log(ex)
+      callback(null, ex)
+    }
   }
 
   _getClaimStatus = async (web3, tokenAddress, account, callback) => {

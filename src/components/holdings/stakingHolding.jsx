@@ -366,29 +366,6 @@ class StakingHolding extends Component {
     }
   }
 
-  // onDeposit = () => {
-  //   this.setState({ amountError: false })
-
-  //   const { amount } = this.state
-  //   const { asset, startLoading } = this.props
-
-  //   if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
-  //     this.setState({ amountError: true })
-  //     return false
-  //   }
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
-  // }
-
-  // onDepositAll = () => {
-  //   const { asset, startLoading } = this.props
-
-  //   this.setState({ loading: true })
-  //   startLoading()
-  //   dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
-  // }
 
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
