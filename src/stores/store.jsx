@@ -89,8 +89,8 @@ class Store {
           claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote.`,
 
           // pToken
-          underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0x8B231B9994c21b454820fF2F0F6Ee71F69901ADE',
+          underlyingTokenSymbol: 'cDAI',
+          underlyingTokenAddress: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
           pTokenAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
@@ -98,8 +98,8 @@ class Store {
           feeModelAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
 
           // Shield Token
-          reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x0d9c8D17d2e9e62CdB1F641348A9E7d8450B4c65',
+          reserveTokenSymbol: 'WETH',
+          reserveTokenAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
           shieldTokenAddress: '0x72Dd0481BB794dd44F6ae9afCe08250e253Eb5D4',
@@ -1336,15 +1336,18 @@ class Store {
     async.times(protektContracts.length, (index, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getTokenUSDPrice(web3, protektContracts[index].pTokenAddress, protektContracts[index].pTokenContractABI, account, callbackInner) },
+        (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].pTokenAddress, protektContracts[index].pTokenContractABI, account, callBackInner)},
+        (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].underlyingTokenSymbol ,callbackInner)},
       ], (err, data) => {
-         // not sure if have to check if tokenUSD price or ETH balance hit an error here
-        if(data[0] > 0){
+        // not sure if need to check for errors for non-values if have more pcontracts here
+        if(data[0] && data[0] > 0){
+          let usersShareOfUnderlyingToken = data[0] * data[1]
+          let amountCoveredUsd = usersShareOfUnderlyingToken * data[2]
           let coverageHolding= {
             protektId: protektContracts[index].id,
             protektIndex: index,
             amountCoveredToken: data[0],
-            amountCoveredUsd: '$' + (data[0] * data[1]),
+            amountCoveredUsd: '$' + amountCoveredUsd,
             claimableRewardAmountToken: `10`, 
             claimableRewardAmountUsd: `$40`,
           }
@@ -1379,16 +1382,18 @@ class Store {
     async.times(protektContracts.length, (index, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getTokenUSDPrice(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenContractABI, account, callbackInner) },
-      ], (err, data) => {
-        // not sure if have to check if tokenUSD price or ETH balance hit an error here
-        if(data[0] > 0){
+        (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenContractABI, account, callBackInner)},
+        (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].reserveTokenSymbol, callbackInner) },
+      ], async (err, data) => {
+         // not sure if need to check for errors for non-values if have more pcontracts here
+        if(data[0] && data[0] > 0){
+          let usersShareOfReserveToken = data[0] * data[1]
+          let amountStakedUsd = usersShareOfReserveToken * data[2]
           let stakingHolding= {
             protektId: protektContracts[index].id,
             protektIndex: index,
-            // Calculated Fields
             amountStakedToken: data[0],
-            amountStakedUsd: '$' + (data[0] * data[1]),
+            amountStakedUsd: '$' + amountStakedUsd,
             claimableRewardAmountToken: `10`, 
             claimableRewardAmountUsd: `$40`,
           }
@@ -1411,15 +1416,13 @@ class Store {
       Need to pass in token ID here and add that to coin gecko search instead of dai
       - will this always be the tokens passed in ID? eg reserve/underlying from protekt?
   */
-  _getTokenUSDPrice = async (web3, tokenAddress, tokenABI, account , callback) => {
+  _getTokenUSDPrice = async ( tokenSymbol,callback) => {
+    console.log(`token symbol: ${tokenSymbol}`)
     try {
-      let tokenId = "dai" // pass this in
-      const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress)
-      const pricePerFullShare = await tokenContract.methods.getPricePerFullShare().call({ from: account.address })
-      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd,eth`
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenSymbol}&vs_currencies=usd,eth`
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
-      const priceInUsd = (pricePerFullShare/1e18) * priceJSON[tokenId]['usd']
+      const priceInUsd = priceJSON[tokenSymbol.toLowerCase()]['usd']
 
       callback(null, priceInUsd)
 
@@ -1568,9 +1571,18 @@ class Store {
     return rawTx
   }
 
-  _getPricePerFullShare = async (web3, iEarnContract) => {
-    const balance = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ }), 'ether');
-    return balance
+  _getPricePerFullShare = async (web3, tokenAddress, tokenABI, account , callback) => {
+    console.log('inside price per full share')
+    console.log(tokenABI)
+    try {
+      const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress)
+      const pricePerFullShare = await tokenContract.methods.getPricePerFullShare().call({ from: account.address })
+      callback(null, (pricePerFullShare/1e18))
+
+    } catch (ex) {
+      console.log(ex)
+      callback(null, ex)
+    }
   }
 
   getBestPrice = (payload) => {

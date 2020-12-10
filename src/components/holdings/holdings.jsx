@@ -327,7 +327,7 @@ class Vault extends Component {
       basedOn: basedOn ? parseInt(basedOn) : 1,
       loading: true,
       coverageLoading: true,
-      stakingLoadining: true,
+      stakingLoading: true,
       coverageExpanded: null,
       stakingExpanded: null,
     }
