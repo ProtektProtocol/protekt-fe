@@ -1347,7 +1347,7 @@ class Store {
             protektId: protektContracts[index].id,
             protektIndex: index,
             amountCoveredToken: data[0],
-            amountCoveredUsd: '$' + amountCoveredUsd,
+            amountCoveredUsd: amountCoveredUsd,
             claimableRewardAmountToken: `10`, 
             claimableRewardAmountUsd: `$40`,
           }
@@ -1393,7 +1393,7 @@ class Store {
             protektId: protektContracts[index].id,
             protektIndex: index,
             amountStakedToken: data[0],
-            amountStakedUsd: '$' + amountStakedUsd,
+            amountStakedUsd: amountStakedUsd,
             claimableRewardAmountToken: `10`, 
             claimableRewardAmountUsd: `$40`,
           }

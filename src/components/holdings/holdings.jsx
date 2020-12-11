@@ -535,7 +535,7 @@ class Vault extends Component {
               </div>
               <div className={classes.headingEarning}>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'AMOUNT COVERED' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.amountCoveredUsd }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ '$' + asset.amountCoveredUsd.toFixed(2) }</Typography>
                 <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'COVERAGE' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
@@ -596,7 +596,7 @@ class Vault extends Component {
               </div>
               <div className={classes.headingEarning}>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'YOUR STAKED AMOUNT' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.amountStakedUsd }</Typography>
+                <Typography variant={ 'h3' } noWrap>{'$' + asset.amountStakedUsd.toFixed(2) }</Typography>
                 <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL APY' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.shieldNetApy }</Typography>
