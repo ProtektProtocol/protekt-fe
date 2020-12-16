@@ -410,18 +410,12 @@ class Asset extends Component {
     }
   }
 
-  /*
-    Users should only be able to deposit positive amounts less than their current balance.
-    Users will likely need to approve the smart contract to send the amount before depositing.
-  // */
 
   onDeposit = (user) => {
-    // console.log(`\n \n \n \n  DEPOSIT PRESSED FOR ${user}  \n \n \n`)
     this.setState({ amountError: false })
     const { amount } = this.state
     const { pContract, startLoading } = this.props
 
-    // console.log('amount to deposit :' + amount)
     let transactionTokenBalance = null
     let erc20address = null
     let vaultContractAddress = null

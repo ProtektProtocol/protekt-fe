@@ -1417,7 +1417,6 @@ class Store {
       - will this always be the tokens passed in ID? eg reserve/underlying from protekt?
   */
   _getTokenUSDPrice = async ( tokenSymbol,callback) => {
-    console.log(`token symbol: ${tokenSymbol}`)
     try {
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenSymbol}&vs_currencies=usd,eth`
       const priceString = await rp(url);
@@ -1480,7 +1479,6 @@ class Store {
     if(erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
-        console.log('BALANCE FOUND : ' + eth_balance + ' for eth')
         callback(null, parseFloat(eth_balance))
       } catch(ex) {
         console.log(ex)
@@ -1572,8 +1570,6 @@ class Store {
   }
 
   _getPricePerFullShare = async (web3, tokenAddress, tokenABI, account , callback) => {
-    console.log('inside price per full share')
-    console.log(tokenABI)
     try {
       const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress)
       const pricePerFullShare = await tokenContract.methods.getPricePerFullShare().call({ from: account.address })
@@ -1744,7 +1740,6 @@ class Store {
   depositVault = (payload) => {
     const account = store.getStore('account')
     const { asset, amount, erc20address, vaultContractAddress } = payload.content
-    //console.log(`\n \n \n hit deposit`)
 
     // pass in erc20 address and vault address to deposit and pass in to below
     this._checkApproval(erc20address, account, amount, vaultContractAddress, (err) => {
@@ -1830,9 +1825,6 @@ class Store {
     let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
-
-    console.log(`Sending ${amountToSend} of ${erc20address} to ${vaultContractAddress}`)
-    console.log('account',account)
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -2049,7 +2041,6 @@ class Store {
     })
     .on('receipt', function(receipt){
       console.log(receipt);
-      console.log('\Nn \n \n HITTING RECEIPT')
 
       emitter.emit(WITHDRAW_VAULT_RETURNED, receipt.transactionHash)
     })

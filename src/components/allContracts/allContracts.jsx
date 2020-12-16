@@ -467,9 +467,7 @@ class Vault extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    // console.log('\n \n \n Inside protekt block')
-    // console.log('pContracts:')
-    // console.log(protektContracts)
+
     return protektContracts.filter((pContract) => {
 
       if(hideZero && (pContract.balance === 0 && pContract.vaultBalance === 0)) {
