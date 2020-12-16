@@ -241,8 +241,7 @@ class StakingHolding extends Component {
       loading
     } = this.state
 
-    // console.log('\n \n \n inside staking holdings')
-    // console.log(asset)
+
 
     return (
       <div className={ classes.vaultContainer }>
@@ -310,7 +309,7 @@ class StakingHolding extends Component {
                   className={ classes.actionButton }
                   variant="outlined"
                   color="primary"
-                  disabled={ loading || asset.shieldTokenBalance <= 0 || asset.withdrawalsDisabled === true }
+                  disabled={ loading || asset.shieldTokenBalance <= 0 || asset.withdrawalsDisabled === true || asset.claimStatus!= '0' }
                   onClick={ this.onWithdraw }
                   fullWidth
                   >
