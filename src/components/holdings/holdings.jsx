@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
+import numeral from "numeral";
+import locales from "numeral"
 import {
   Typography,
   Accordion,
@@ -46,6 +48,7 @@ import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
+
 
 const styles = theme => ({
   root: {
@@ -535,7 +538,7 @@ class Vault extends Component {
               </div>
               <div className={classes.headingEarning}>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'AMOUNT COVERED' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ '$' + asset.amountCoveredUsd.toFixed(2) }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ '$' + numeral(asset.amountCoveredUsd.toFixed(2)).format('0,0[.]00') }</Typography>
                 <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'COVERAGE' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
@@ -596,7 +599,7 @@ class Vault extends Component {
               </div>
               <div className={classes.headingEarning}>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'YOUR STAKED AMOUNT' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{'$' + asset.amountStakedUsd.toFixed(2) }</Typography>
+                <Typography variant={ 'h3' } noWrap>{'$' + numeral(asset.amountStakedUsd.toFixed(2)).format('0,0[.]00') }</Typography>
                 <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL APY' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.shieldNetApy }</Typography>

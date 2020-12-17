@@ -241,8 +241,6 @@ class StakingHolding extends Component {
       loading
     } = this.state
 
-    // console.log('\n \n \n inside staking holdings')
-    // console.log(asset)
 
     return (
       <div className={ classes.vaultContainer }>
