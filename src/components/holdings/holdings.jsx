@@ -60,11 +60,23 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  disclaimerContainer: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '100%',
+    marginTop: '40px',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '900px',
+    }
+  },
   investedContainerLoggedOut: {
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'start',
+    alignItems: 'center',
     justifyContent: 'center',
     minWidth: '100%',
     marginTop: '40px',
@@ -76,7 +88,7 @@ const styles = theme => ({
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'start',
     justifyContent: 'flex-start',
     minWidth: '100%',
     marginTop: '40px',
@@ -455,8 +467,10 @@ class Vault extends Component {
     if(!account || !account.address) {
       return (
         <div className={ classes.root }>
+          <div className={ classes.disclaimerContainer }>
+            <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
+          </div>
           <div className={ classes.investedContainerLoggedOut }>
-          <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
               <Typography variant='h3'>Connect your wallet to continue</Typography>
             </div>
@@ -468,8 +482,10 @@ class Vault extends Component {
 
     return (
       <div className={ classes.root }>
-        <div className={ classes.investedContainer }>
+        <div className={ classes.disclaimerContainer }>
           <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
+        </div>
+        <div className={ classes.investedContainer }>
           <div>
             <Typography variant={ 'h3' }>Your Coverage</Typography>
             { coverageLoading && <Loader /> }
