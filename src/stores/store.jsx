@@ -1,6 +1,10 @@
 import config from "../config";
 import async from 'async';
 import {
+  COVERAGE_HOLDINGS_RETURNED,
+  STAKING_HOLDINGS_RETURNED,
+  GET_COVERAGE_HOLDINGS,
+  GET_STAKING_HOLDINGS,
   ERROR,
   GET_PROTEKT_CONTRACT_BALANCES,
 
@@ -85,24 +89,24 @@ class Store {
           claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote.`,
 
           // pToken
-          underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae',
+          underlyingTokenSymbol: 'cDAI',
+          underlyingTokenAddress: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          pTokenAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
           pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
+          feeModelAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
 
           // Shield Token
-          reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x7856BBb02f4d6A7FE95bb6F823bD3C34Ce5baD6f',
+          reserveTokenSymbol: 'WETH',
+          reserveTokenAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x8Ef9221539b36EaF757F5e33e848f6d9c904b1f0',
+          shieldTokenAddress: '0x72Dd0481BB794dd44F6ae9afCe08250e253Eb5D4',
           shieldTokenContractABI: config.vaultContractV4ABI,
-          controllerAddress: '0x8647f933A0b9EB01322ffCeB8BAd97C9d8Dbdc19',
+          controllerAddress: '0x7f73Ae1162E167FBD3A7B117ED7F15344a604578',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
-          claimsManagerAddress: '0x73edc408d780A5073beC50488923859f01aB0785',
+          claimsManagerAddress: '0x067c6d278d0F544ACe67a1CEdf9e99c0024A5677',
 
           // Calculated Fields
           underlyingTokenBalance: 0,
@@ -140,28 +144,10 @@ class Store {
         },
       ],
       coverageHoldings: [
-        {
-          protektId: 'TEST-market',
-          protektIndex: 0,
-
-          // Calculated Fields
-          amountCoveredToken: 10,
-          amountCoveredUsd: 100,
-          claimableRewardAmountToken: `$10`,
-          claimableRewardAmountUsd: `$40`,
-        }
+      
       ],
       stakingHoldings: [
-        {
-          protektId: 'TEST-market',
-          protektIndex: 0,
-
-          // Calculated Fields
-          amountStakedToken: 10,
-          amountStakedUsd: 4000,
-          claimableRewardAmountToken: `$10`,
-          claimableRewardAmountUsd: `$40`,
-        }
+    
       ],
       statistics: [],
       universalGasPrice: '70',
@@ -209,6 +195,12 @@ class Store {
         console.log('Dispatcher payload:', payload)
 
         switch (payload.type) {
+          case GET_COVERAGE_HOLDINGS:
+            this.getCoverageHoldings(payload);
+            break;
+          case GET_STAKING_HOLDINGS:
+            this.getStakingHoldings(payload);
+            break;
           case GET_PROTEKT_CONTRACT_BALANCES:
             this.getProtektContractBalances(payload);
             break;
@@ -1328,6 +1320,117 @@ class Store {
     })
   }
 
+  getCoverageHoldings = async () => {
+    const account = store.getStore('account')
+    const protektContracts = store.getStore('protektContracts')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
+
+    async.times(protektContracts.length, (index, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress, account, callbackInner) },
+        (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].pTokenAddress, protektContracts[index].pTokenContractABI, account, callBackInner)},
+        (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].underlyingTokenSymbol ,callbackInner)},
+      ], (err, data) => {
+        // not sure if need to check for errors for non-values if have more pcontracts here
+        if(data[0] && data[0] > 0){
+          let usersShareOfUnderlyingToken = data[0] * data[1]
+          let amountCoveredUsd = usersShareOfUnderlyingToken * data[2]
+          let coverageHolding= {
+            protektId: protektContracts[index].id,
+            protektIndex: index,
+            amountCoveredToken: data[0],
+            amountCoveredUsd: amountCoveredUsd,
+            claimableRewardAmountToken: `10`, 
+            claimableRewardAmountUsd: `$40`,
+          }
+          callback(null, coverageHolding)
+        }else{
+          callback()
+        }
+        
+      })
+    }, (err, coverageHoldings) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+      store.setStore({ coverageHoldings: coverageHoldings })
+      return emitter.emit(COVERAGE_HOLDINGS_RETURNED, coverageHoldings)
+    })
+  }
+
+  getStakingHoldings = async () => {
+    const account = store.getStore('account')
+    const protektContracts = store.getStore('protektContracts')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
+
+    async.times(protektContracts.length, (index, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, account, callbackInner) },
+        (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenContractABI, account, callBackInner)},
+        (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].reserveTokenSymbol, callbackInner) },
+      ], async (err, data) => {
+         // not sure if need to check for errors for non-values if have more pcontracts here
+        if(data[0] && data[0] > 0){
+          let usersShareOfReserveToken = data[0] * data[1]
+          let amountStakedUsd = usersShareOfReserveToken * data[2]
+          let stakingHolding= {
+            protektId: protektContracts[index].id,
+            protektIndex: index,
+            amountStakedToken: data[0],
+            amountStakedUsd: amountStakedUsd,
+            claimableRewardAmountToken: `10`, 
+            claimableRewardAmountUsd: `$40`,
+          }
+          callback(null, stakingHolding)
+        }else{
+          callback()
+        }
+        
+      })
+    }, (err, stakingHoldings) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+      store.setStore({ stakingHoldings: stakingHoldings })
+      return emitter.emit(STAKING_HOLDINGS_RETURNED, stakingHoldings)
+    })
+  }
+
+  /*
+      Need to pass in token ID here and add that to coin gecko search instead of dai
+      - will this always be the tokens passed in ID? eg reserve/underlying from protekt?
+  */
+  _getTokenUSDPrice = async ( tokenSymbol,callback) => {
+    try {
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenSymbol}&vs_currencies=usd,eth`
+      const priceString = await rp(url);
+      const priceJSON = JSON.parse(priceString)
+      const priceInUsd = priceJSON[tokenSymbol.toLowerCase()]['usd']
+
+      callback(null, priceInUsd)
+
+    } catch (ex) {
+      console.log(ex)
+      callback(null, ex)
+    }
+  }
+
   _getClaimStatus = async (web3, tokenAddress, account, callback) => {
     let claimsManagerContract = new web3.eth.Contract(config.claimsManagerCoreABI, tokenAddress)
     try {
@@ -1376,7 +1479,6 @@ class Store {
     if(erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
-        console.log('BALANCE FOUND : ' + eth_balance + ' for eth')
         callback(null, parseFloat(eth_balance))
       } catch(ex) {
         console.log(ex)
@@ -1467,9 +1569,16 @@ class Store {
     return rawTx
   }
 
-  _getPricePerFullShare = async (web3, iEarnContract) => {
-    const balance = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ }), 'ether');
-    return balance
+  _getPricePerFullShare = async (web3, tokenAddress, tokenABI, account , callback) => {
+    try {
+      const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress)
+      const pricePerFullShare = await tokenContract.methods.getPricePerFullShare().call({ from: account.address })
+      callback(null, (pricePerFullShare/1e18))
+
+    } catch (ex) {
+      console.log(ex)
+      callback(null, ex)
+    }
   }
 
   getBestPrice = (payload) => {
@@ -1631,7 +1740,6 @@ class Store {
   depositVault = (payload) => {
     const account = store.getStore('account')
     const { asset, amount, erc20address, vaultContractAddress } = payload.content
-    //console.log(`\n \n \n hit deposit`)
 
     // pass in erc20 address and vault address to deposit and pass in to below
     this._checkApproval(erc20address, account, amount, vaultContractAddress, (err) => {
@@ -1717,9 +1825,6 @@ class Store {
     let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
-
-    console.log(`Sending ${amountToSend} of ${erc20address} to ${vaultContractAddress}`)
-    console.log('account',account)
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -1936,7 +2041,6 @@ class Store {
     })
     .on('receipt', function(receipt){
       console.log(receipt);
-      console.log('\Nn \n \n HITTING RECEIPT')
 
       emitter.emit(WITHDRAW_VAULT_RETURNED, receipt.transactionHash)
     })

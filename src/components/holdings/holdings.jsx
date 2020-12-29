@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
+import numeral from "numeral";
+import locales from "numeral"
 import {
   Typography,
   Accordion,
@@ -28,7 +30,7 @@ import Loader from '../loader'
 import {
   ERROR,
   GET_VAULT_BALANCES_FULL,
-  VAULT_BALANCES_FULL_RETURNED,
+  GET_COVERAGE_HOLDINGS,
   DEPOSIT_VAULT_RETURNED,
   WITHDRAW_VAULT_RETURNED,
   DEPOSIT_ALL_VAULT_RETURNED,
@@ -36,13 +38,17 @@ import {
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
   GET_PROTEKT_CONTRACT_BALANCES,
-  BALANCES_RETURNED
+  COVERAGE_HOLDINGS_RETURNED,
+  BALANCES_RETURNED,
+  GET_STAKING_HOLDINGS,
+  STAKING_HOLDINGS_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
+
 
 const styles = theme => ({
   root: {
@@ -323,13 +329,16 @@ class Vault extends Component {
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
       basedOn: basedOn ? parseInt(basedOn) : 1,
       loading: true,
+      coverageLoading: true,
+      stakingLoading: true,
       coverageExpanded: null,
       stakingExpanded: null,
     }
 
     if(account && account.address) {
-      // dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+      dispatcher.dispatch({ type: GET_COVERAGE_HOLDINGS, content: {} })
       dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_STAKING_HOLDINGS, content: {} })
     }
   }
   componentWillMount() {
@@ -338,7 +347,8 @@ class Vault extends Component {
     emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    // emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.on(COVERAGE_HOLDINGS_RETURNED, this.coverageHoldingsReturned);
+    emitter.on(STAKING_HOLDINGS_RETURNED, this.stakingHoldingsReturned);
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
@@ -352,7 +362,8 @@ class Vault extends Component {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    // emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.removeListener(COVERAGE_HOLDINGS_RETURNED, this.coverageHoldingsReturned);
+    emitter.on(STAKING_HOLDINGS_RETURNED, this.stakingHoldingsReturned);
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
 
@@ -362,17 +373,35 @@ class Vault extends Component {
     })
   };
 
+  coverageHoldingsReturned = (coverageHoldings) => {
+    this.setState({
+      coverageLoading: false,
+      coverageHoldings: coverageHoldings
+    })
+  }
+
+  stakingHoldingsReturned = (stakingHoldings) => {
+    this.setState({
+      stakingLoading: false,
+      stakingHoldings: stakingHoldings
+    })
+  }
+
   connectionConnected = () => {
     const { t } = this.props
     const account = store.getStore('account')
     this.setState({
       loading: true,
+      stakingLoading: true,
+      coverageLoading: true,
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
 
     //dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
     dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_COVERAGE_HOLDINGS, content: {} })
+    dispatcher.dispatch({ type: GET_STAKING_HOLDINGS, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -401,6 +430,8 @@ class Vault extends Component {
 
   showHash = (txHash) => {
     dispatcher.dispatch({ type: GET_PROTEKT_CONTRACT_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_COVERAGE_HOLDINGS, content: {} })
+    dispatcher.dispatch({ type: GET_STAKING_HOLDINGS, content: {} })
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
     this.setState({ loading: false })
@@ -417,6 +448,8 @@ class Vault extends Component {
       loading,
       account,
       snackbarMessage,
+      coverageLoading,
+      stakingLoading
     } = this.state
 
     if(!account || !account.address) {
@@ -439,10 +472,12 @@ class Vault extends Component {
           <Typography variant={'h5'} className={ classes.disclaimer }>This project is in beta. Use at your own risk.</Typography>
           <div>
             <Typography variant={ 'h3' }>Your Coverage</Typography>
-            { this.renderCoverageHoldings() }
+            { coverageLoading && <Loader /> }
+            { !coverageLoading && this.renderCoverageHoldings() }
             <br />
+            { stakingLoading && <Loader /> }
             <Typography variant={ 'h3' }>Your Stake</Typography>
-            { this.renderStakingHoldings() }
+            {!stakingLoading && this.renderStakingHoldings() }
           </div>
         </div>
         { loading && <Loader /> }
@@ -468,11 +503,12 @@ class Vault extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    if (!coverageHoldings || !coverageHoldings.length) {
+    if (!coverageHoldings || !coverageHoldings.length || coverageHoldings[0] === undefined) {
       return (
         <Typography variant={'h5'} className={ classes.grey }>No coverage yet.</Typography>
       )
     }
+
 
     return coverageHoldings.map((temp) => {
       let asset = { ...temp,  ...protektContracts[temp.protektIndex] } 
@@ -502,7 +538,7 @@ class Vault extends Component {
               </div>
               <div className={classes.headingEarning}>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'AMOUNT COVERED' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.amountCoveredToken }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ '$' + numeral(asset.amountCoveredUsd.toFixed(2)).format('0,0[.]00') }</Typography>
                 <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'COVERAGE' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.coverageSummaryDisplay }</Typography>
@@ -529,7 +565,7 @@ class Vault extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    if (!stakingHoldings || !stakingHoldings.length) {
+    if (!stakingHoldings || !stakingHoldings.length || stakingHoldings[0] === undefined) {
       return (
         <Typography variant={'h5'} className={ classes.grey }>Not staking yet.</Typography>
       )
@@ -563,7 +599,7 @@ class Vault extends Component {
               </div>
               <div className={classes.headingEarning}>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'YOUR STAKED AMOUNT' }</Typography>
-                <Typography variant={ 'h3' } noWrap>{ asset.amountStakedUsd }</Typography>
+                <Typography variant={ 'h3' } noWrap>{'$' + numeral(asset.amountStakedUsd.toFixed(2)).format('0,0[.]00') }</Typography>
                 <br/>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ 'TOTAL APY' }</Typography>
                 <Typography variant={ 'h3' } noWrap>{ asset.shieldNetApy }</Typography>
