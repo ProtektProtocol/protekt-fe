@@ -1754,7 +1754,7 @@ class Store {
    */
   _callDepositVault = async (erc20address,vaultContractAddress, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
-    let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
+    let vaultContract = new web3.eth.Contract(config.shieldTokenABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
 
