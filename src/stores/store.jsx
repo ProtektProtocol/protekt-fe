@@ -64,85 +64,17 @@ const Emitter = require('events').EventEmitter;
 const dispatcher = new Dispatcher();
 const emitter = new Emitter();
 
+
 class Store {
   constructor() {
 
+    // on creation - fetch below from store and calculated calculated values
+
+    console.log('\n \n in setup')
+    console.log(config['protektContracts'])
+
     this.store = {
-      protektContracts: [
-        {
-          // TEST Contract Info
-          id: 'TEST-market',
-          name: 'Compound DAI',
-          insuredTokenSymbol: 'DAI',
-          insuredPool: 'Compound',
-          logo: 'cDAI-logo',
-          description: 'A test insurance market on top of the TEST market on TEST.',
-
-          // Display fields
-          costSummaryDisplay: ' 20% COMP',
-          coverageSummaryDisplay: '100% Coverage',
-          strategySummaryDisplay: 'ETH (Not invested)',
-          claimManagerSummaryDisplay: 'DAO vote',
-          costDisplay: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
-          coverageDisplay: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          strategyDisplay: 'Hodling (0% APY)',
-          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote.`,
-
-          // pToken
-          underlyingTokenSymbol: 'cDAI',
-          underlyingTokenAddress: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
-          underlyingTokenContractABI: config.vaultContractV4ABI,
-          pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
-          pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
-
-          // Shield Token
-          reserveTokenSymbol: 'WETH',
-          reserveTokenAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-          reserveTokenContractABI: config.vaultContractV4ABI,
-          shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x72Dd0481BB794dd44F6ae9afCe08250e253Eb5D4',
-          shieldTokenContractABI: config.vaultContractV4ABI,
-          controllerAddress: '0x7f73Ae1162E167FBD3A7B117ED7F15344a604578',
-          strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
-          claimsManagerAddress: '0x067c6d278d0F544ACe67a1CEdf9e99c0024A5677',
-
-          // Calculated Fields
-          underlyingTokenBalance: 0,
-          pTokenBalance: 0,
-          reserveTokenBalance: 0,
-          shieldTokenBalance: 0,
-          shieldRewardApy: `1.40%`,
-          shieldStrategyApy: `0%`,
-          shieldNetApy: `1.40%`,
-          shieldTotalAmountStakedReserve: `1000`,
-          shieldTotalAmountStakedUsd: `$200k`,
-          depositsDisabled: false,
-          withdrawalsDisabled: false,
-          claimableRewardsDisabled: false,
-          lastBlockMeasurement: 10774489,
-
-          // Claims Fields
-          claimStatus: 'Active',
-          activePayoutEvent: false,
-          investigationPeriod: 43200,
-          investigationPeriodDisplay: '1 week',
-          currentInvestigationPeriodEnd: 0,
-
-          // To be Deprecated?
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          measurement: 1e18,
-          price_id: 'ethereum',
-          vaultContractABI: config.vaultContractV4ABI, // To be deprecated
-          vaultSymbol: 'pcDAI', // To be deprecated
-          erc20address: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae', // To be deprecated
-          vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
-          symbol: 'cDAI-logo', // To be deprecated
-        },
-      ],
+      protektContracts: config.protektContracts,
       coverageHoldings: [
       
       ],
