@@ -3,7 +3,7 @@ import production from "./production.config";
 import example from "./example.config";
 import test from "./test.config.js"
 
-const env = process.env.APP_ENV || 'test';
+const env = process.env.APP_ENV || 'test'; // defaulting to after ||
 
 console.log('\n logging env')
 console.log(env)
@@ -15,4 +15,4 @@ const config = {
   test
 };
 
-export default config[env]; // switching with the env is not working here 
+export default config[env]; 
