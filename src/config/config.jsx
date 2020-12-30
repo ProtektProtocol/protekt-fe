@@ -3,7 +3,7 @@ import production from "./production.config";
 import example from "./example.config";
 import test from "./test.config.js"
 
-const env = process.env.APP_ENV || 'development';
+const env = process.env.APP_ENV || 'test';
 
 console.log('\n logging env')
 console.log(env)
