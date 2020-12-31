@@ -1416,8 +1416,8 @@ class Store {
         console.log(ex)
         return callback(ex)
       }
-    } else if(erc20address === "0x6d7f0754ffeb405d23c51ce938289d4835be3b14" || erc20address === "0x229B052A8BA11523Be23F311fB456CEf5428BdF0" ){
-        // rinkeby cDAI & pcDA
+    } else if(erc20address === "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad" || erc20address === "0x395004f214954eC324F517f3EF1b0eC137c0acD2" ){
+        // kovan cDAI & pcDA
       let contract = new web3.eth.Contract(config.erc20ABI, erc20address)
 
       try {
@@ -1772,7 +1772,7 @@ class Store {
     var amountToSend = web3.utils.toWei(amount, "ether")
 
     // change the cDAI decimals - change to add back in all assets programatically into config / store
-    if(erc20address === "0x6d7f0754ffeb405d23c51ce938289d4835be3b14"){
+    if(erc20address === "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad"){
       amountToSend = amount*10**8
     }
 
@@ -1896,6 +1896,9 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount, vaultContractAddress } = payload.content
 
+    console.log('\n \n debugging withdraw')
+    console.log(vaultContractAddress)
+
     /*
         Removed below as doesn't seem to be needed?
         Possibly may be for approval but unsure what the proxy is - ask corbin
@@ -1934,9 +1937,9 @@ class Store {
 
     // below uses deprecated feild from assets
 
-    // if (asset.decimals !== 18) {
-    //   amountSend = Math.round(amount*10**asset.decimals);
-    // }
+    if (asset.decimals !== 18) {
+      amountSend = Math.round(amount*10**asset.decimals);
+    }
 
     yVaultCheckContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
@@ -1968,13 +1971,11 @@ class Store {
 
     var amountSend = web3.utils.toWei(amount, "ether")
     
-    // below deprecated
 
-    // if (asset.decimals !== 18) {
-    //   amountSend = Math.round(amount*10**asset.decimals);
+    // change the pcDAI decimals - change to add back in all assets programatically into config / store
+    // if(vaultContractAddress === "0x395004f214954eC324F517f3EF1b0eC137c0acD2"){
+    //   amountSend = amount*10**8
     // }
-
-    
 
     let functionCall = vaultContract.methods.withdraw(amountSend)
     if(vaultContractAddress === 'Ethereum') {
