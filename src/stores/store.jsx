@@ -1408,7 +1408,7 @@ class Store {
   }
 
   _getERC20Balance = async (web3, erc20address, account, callback) => {
-    if(erc20address === 'Ethereum') {
+    if(erc20address === 'Ethereum' ) {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
         callback(null, parseFloat(eth_balance))
@@ -1416,7 +1416,20 @@ class Store {
         console.log(ex)
         return callback(ex)
       }
-    } else {
+    } else if(erc20address === "0x6d7f0754ffeb405d23c51ce938289d4835be3b14" || erc20address === "0x229B052A8BA11523Be23F311fB456CEf5428BdF0" ){
+        // rinkeby cDAI & pcDA
+      let contract = new web3.eth.Contract(config.erc20ABI, erc20address)
+
+      try {
+        var balance = await contract.methods.balanceOf(account.address).call({ from: account.address });
+        balance = parseFloat(balance)/10**8 // changed to 10 for cDAI
+        return callback(null, parseFloat(balance))
+      } catch(ex) {
+        console.log(ex)
+        return callback(ex)
+      }
+    }
+    else {
       let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
 
       try {
@@ -1754,9 +1767,14 @@ class Store {
    */
   _callDepositVault = async (erc20address,vaultContractAddress, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
-    let vaultContract = new web3.eth.Contract(config.shieldTokenABI, vaultContractAddress)
+    let vaultContract = new web3.eth.Contract(config.pTokenABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
+
+    // change the cDAI decimals - change to add back in all assets programatically into config / store
+    if(erc20address === "0x6d7f0754ffeb405d23c51ce938289d4835be3b14"){
+      amountToSend = amount*10**8
+    }
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
