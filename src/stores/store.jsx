@@ -89,22 +89,22 @@ class Store {
           claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote.`,
 
           // pToken
-          underlyingTokenSymbol: 'cDAI',
-          underlyingTokenAddress: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
+          underlyingTokenSymbol: 'TESTU',
+          underlyingTokenAddress: '0xf100bDe449A098237A354D800730A155F8f30Cfe',
           underlyingTokenContractABI: config.vaultContractV4ABI,
           pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
+          pTokenAddress: '0xAc908F3c66F76Fb177E1066d5F1139488B353305',
           pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0xA3322933f585A3bB55F9c5B55de6bdf495cE6F16',
+          feeModelAddress: '0xAc908F3c66F76Fb177E1066d5F1139488B353305',
 
           // Shield Token
-          reserveTokenSymbol: 'WETH',
-          reserveTokenAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          reserveTokenSymbol: 'TESTR',
+          reserveTokenAddress: '0x117F767137d2F3809Fe68a27B88d6349f9e9C093',
           reserveTokenContractABI: config.vaultContractV4ABI,
           shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0x72Dd0481BB794dd44F6ae9afCe08250e253Eb5D4',
+          shieldTokenAddress: '0xE9AE0b42d4E47a05f75E35b235C2EcD6Ce8C96AE',
           shieldTokenContractABI: config.vaultContractV4ABI,
-          controllerAddress: '0x7f73Ae1162E167FBD3A7B117ED7F15344a604578',
+          controllerAddress: '0x71C0Ae00157fc1616675cd04Bb3C5e1E59946676',
           strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
           claimsManagerAddress: '0x067c6d278d0F544ACe67a1CEdf9e99c0024A5677',
 

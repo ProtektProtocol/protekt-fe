@@ -198,36 +198,28 @@ class Asset extends Component {
     super()
 
     this.state = {
-      amount: '',
-      amountError: false,
-      redeemAmount: '',
-      redeemAmountError: false,
+      underlyingAmount: '',
+      reserveAmount: '',
+      underlyingAmountError: false,
+      reserveAmountError: false,
       account: store.getStore('account'), 
     }
   }
 
   componentWillMount() {
     emitter.on(DEPOSIT_VAULT_RETURNED, this.depositReturned);
-    emitter.on(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
     emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.depositReturned);
-    emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.withdrawReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.depositReturned);
-    emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
     emitter.removeListener(DEPOSIT_ALL_VAULT_RETURNED, this.depositReturned);
-    emitter.removeListener(WITHDRAW_ALL_VAULT_RETURNED, this.withdrawReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
   depositReturned = () => {
-    this.setState({ loading: false, amount: '' })
-  };
-
-  withdrawReturned = (txHash) => {
-    this.setState({ loading: false, redeemAmount: '' })
+    this.setState({ loading: false, underlyingAmount: '', reserveAmount:'' })
   };
 
   errorReturned = (error) => {
@@ -237,10 +229,10 @@ class Asset extends Component {
   render() {
     const { classes, pContract} = this.props;
     const {
-      amount,
-      amountError,
-      redeemAmount,
-      redeemAmountError,
+      underlyingAmount,
+      reserveAmount,
+      underlyingAmountError,
+      reserveAmountError,
       loading
     } = this.state
 
@@ -277,9 +269,9 @@ class Asset extends Component {
                 <TextField
                   fullWidth
                   className={ classes.actionInput }
-                  id='amount'
-                  value={ amount }
-                  error={ amountError }
+                  id='underlyingAmount'
+                  value={ underlyingAmount }
+                  error={ underlyingAmountError }
                   onChange={ this.onChange }
                   disabled={ loading }
                   placeholder="0.00"
@@ -341,9 +333,9 @@ class Asset extends Component {
                 <TextField
                   fullWidth
                   className={ classes.actionInput }
-                  id='amount'
-                  value={ amount }
-                  error={ amountError }
+                  id='reserveAmount'
+                  value={ reserveAmount }
+                  error={ reserveAmountError }
                   onChange={ this.onChange }
                   disabled={ loading }
                   placeholder="0.00"
@@ -413,23 +405,29 @@ class Asset extends Component {
 
   onDeposit = (user) => {
     this.setState({ amountError: false })
-    const { amount } = this.state
     const { pContract, startLoading } = this.props
+    const { reserveAmount, underlyingAmount} = this.state
 
     let transactionTokenBalance = null
     let erc20address = null
     let vaultContractAddress = null
+    let amount = null
 
     if(user === "INSURER"){
       transactionTokenBalance = pContract.reserveTokenBalance
       erc20address = pContract.reserveTokenAddress
       vaultContractAddress = pContract.shieldTokenAddress
+      amount = reserveAmount
     }
     if(user === "SEEKER"){
       transactionTokenBalance = pContract.underlyingTokenBalance
       erc20address = pContract.underlyingTokenAddress
       vaultContractAddress = pContract.pTokenAddress
+      amount = underlyingAmount
     }
+    
+    console.log('\n \n inside deposit')
+    console.log(amount)
     
     if(!amount || isNaN(amount) || amount <= 0 || amount > transactionTokenBalance) {
       this.setState({ amountError: true })
@@ -442,58 +440,6 @@ class Asset extends Component {
     dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
   }
 
-
-  onWithdraw = () => {
-    this.setState({ redeemAmountError: false })
-
-    const { asset, startLoading  } = this.props
-    let redeemAmount = this.state.redeemAmount/asset.pricePerFullShare
-    redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
-
-    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.vaultBalance) {
-      this.setState({ redeemAmountError: true })
-      return false
-    }
-
-    this.setState({ loading: true })
-    startLoading()
-
-    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: redeemAmount, asset: asset } })
-  }
-
-  onWithdrawAll = () => {
-    const { asset, startLoading } = this.props
-
-    this.setState({ loading: true })
-    startLoading()
-    dispatcher.dispatch({ type: WITHDRAW_ALL_VAULT, content: { asset: asset } })
-  }
-
-  setAmount = (percent) => {
-    if(this.state.loading) {
-      return
-    }
-
-    const { asset } = this.props
-
-    const balance = asset.balance
-    let amount = balance*percent/100
-    amount = Math.floor(amount*10000)/10000;
-
-    this.setState({ amount: amount.toFixed(4) })
-  }
-
-  setRedeemAmount = (percent) => {
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
-    let amount = balance*percent/100
-    amount = Math.floor(amount*10000)/10000;
-
-    this.setState({ redeemAmount: amount.toFixed(4) })
-  }
 }
 
 export default withRouter(withStyles(styles, { withTheme: true })(Asset));
