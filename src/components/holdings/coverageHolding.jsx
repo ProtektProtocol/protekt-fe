@@ -234,9 +234,6 @@ class CoverageHolding extends Component {
   render() {
     const { classes, asset } = this.props;
 
-    console.log('\n \n inside coverage')
-    console.log(asset)
-
     const {
       amount,
       amountError,
