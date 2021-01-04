@@ -380,7 +380,7 @@ class StakingHolding extends Component {
     this.setState({ loading: true })
     startLoading()
 
-    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: amountToWithdraw, vaultContractAddress: asset.shieldTokenAddress } })
+    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: amountToWithdraw, vaultContractAddress: asset.shieldTokenAddress, decimals: asset.shieldTokenDecimals } })
   }
 
   onWithdrawAll = () => {

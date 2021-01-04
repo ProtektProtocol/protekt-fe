@@ -1220,10 +1220,10 @@ class Store {
 
     async.map(protektContracts, (protektContract, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress,protektContract.underlyingTokenDecimals ,account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, protektContract.pTokenDecimals,account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, protektContract.reserveTokenDecimals,account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, protektContract.shieldTokenDecimals,account, callbackInner) },
         (callbackInner) => { this._getWithdrawalsDisabled(web3, protektContract.shieldTokenAddress, config.shieldTokenABI, callbackInner) },
         (callbackInner) => { this._getClaimStatus(web3, protektContract.claimsManagerAddress, account, callbackInner) },
         (callbackInner) => { this._getActivePayoutEvent(web3, protektContract.claimsManagerAddress, account, callbackInner) },
@@ -1267,7 +1267,7 @@ class Store {
 
     async.times(protektContracts.length, (index, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress,protektContracts[index].pTokenDecimals, account, callbackInner) },
         (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].pTokenAddress, protektContracts[index].pTokenContractABI, account, callBackInner)},
         (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].underlyingTokenSymbol ,callbackInner)},
       ], (err, data) => {
@@ -1313,7 +1313,7 @@ class Store {
 
     async.times(protektContracts.length, (index, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenDecimals, account, callbackInner) },
         (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenContractABI, account, callBackInner)},
         (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].reserveTokenSymbol, callbackInner) },
       ], async (err, data) => {
@@ -1407,7 +1407,7 @@ class Store {
     
   }
 
-  _getERC20Balance = async (web3, erc20address, account, callback) => {
+  _getERC20Balance = async (web3, erc20address, decimals, account, callback) => {
     if(erc20address === 'Ethereum' ) {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
@@ -1416,25 +1416,26 @@ class Store {
         console.log(ex)
         return callback(ex)
       }
-    } else if(erc20address === "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad" || erc20address === "0x395004f214954eC324F517f3EF1b0eC137c0acD2" ){
-        // kovan cDAI & pcDA
-      let contract = new web3.eth.Contract(config.erc20ABI, erc20address)
-
-      try {
-        var balance = await contract.methods.balanceOf(account.address).call({ from: account.address });
-        balance = parseFloat(balance)/10**8 // changed to 10 for cDAI
-        return callback(null, parseFloat(balance))
-      } catch(ex) {
-        console.log(ex)
-        return callback(ex)
-      }
     }
+    // } else if(erc20address === "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad" || erc20address === "0x395004f214954eC324F517f3EF1b0eC137c0acD2" ){
+    //     // kovan cDAI & pcDA
+    //   let contract = new web3.eth.Contract(config.erc20ABI, erc20address)
+
+    //   try {
+    //     var balance = await contract.methods.balanceOf(account.address).call({ from: account.address });
+    //     balance = parseFloat(balance)/10**8 // changed to 10 for cDAI
+    //     return callback(null, parseFloat(balance))
+    //   } catch(ex) {
+    //     console.log(ex)
+    //     return callback(ex)
+    //   }
+    // }
     else {
       let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
 
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
-        balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
+        balance = parseFloat(balance)/10**decimals
         return callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
@@ -1684,7 +1685,7 @@ class Store {
 
   depositVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount, erc20address, vaultContractAddress } = payload.content
+    const { asset, amount, erc20address, vaultContractAddress, decimals } = payload.content
 
     // pass in erc20 address and vault address to deposit and pass in to below
     this._checkApproval(erc20address, account, amount, vaultContractAddress, (err) => {
@@ -1692,7 +1693,7 @@ class Store {
         return emitter.emit(ERROR, err);
       }
 
-      this._callDepositVault(erc20address,vaultContractAddress, account, amount, (err, depositResult) => {
+      this._callDepositVault(erc20address,vaultContractAddress, account, amount, decimals, (err, depositResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -1765,15 +1766,15 @@ class Store {
   /**
    *  Need to pass in contract ABI / add it AS DOES NOT EXIST ANYMORE - add from config?
    */
-  _callDepositVault = async (erc20address,vaultContractAddress, account, amount, callback) => {
+  _callDepositVault = async (erc20address,vaultContractAddress, account, amount, decimals,callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let vaultContract = new web3.eth.Contract(config.pTokenABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
 
     // change the cDAI decimals - change to add back in all assets programatically into config / store
-    if(erc20address === "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad"){
-      amountToSend = amount*10**8
+    if(decimals != 18){
+      amountToSend = amount*10**decimals
     }
 
     if(erc20address === 'Ethereum') {
@@ -1894,7 +1895,7 @@ class Store {
 
   withdrawVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount, vaultContractAddress } = payload.content
+    const { asset, amount, vaultContractAddress, decimals } = payload.content
 
     console.log('\n \n debugging withdraw')
     console.log(vaultContractAddress)
@@ -1919,7 +1920,7 @@ class Store {
     //     })
     //   })
     // } else {
-      this._callWithdrawVault(account, amount, vaultContractAddress, (err, withdrawResult) => {
+      this._callWithdrawVault(account, amount, vaultContractAddress, decimals, (err, withdrawResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -1964,18 +1965,16 @@ class Store {
     })
   }
 
-  _callWithdrawVault = async (account, amount, vaultContractAddress, callback) => {
+  _callWithdrawVault = async (account, amount, vaultContractAddress, decimals, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountSend = web3.utils.toWei(amount, "ether")
     
-
-    // change the pcDAI decimals - change to add back in all assets programatically into config / store
-    // if(vaultContractAddress === "0x395004f214954eC324F517f3EF1b0eC137c0acD2"){
-    //   amountSend = amount*10**8
-    // }
+    if(decimals!=18){
+      amountSend = amount*10**decimals
+    }
 
     let functionCall = vaultContract.methods.withdraw(amountSend)
     if(vaultContractAddress === 'Ethereum') {
