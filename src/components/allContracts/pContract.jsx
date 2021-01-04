@@ -419,16 +419,19 @@ class Asset extends Component {
     let transactionTokenBalance = null
     let erc20address = null
     let vaultContractAddress = null
+    let decimals = null
 
     if(user === "INSURER"){
       transactionTokenBalance = pContract.reserveTokenBalance
       erc20address = pContract.reserveTokenAddress
       vaultContractAddress = pContract.shieldTokenAddress
+      decimals = pContract.reserveTokenDecimals
     }
     if(user === "SEEKER"){
       transactionTokenBalance = pContract.underlyingTokenBalance
       erc20address = pContract.underlyingTokenAddress
       vaultContractAddress = pContract.pTokenAddress
+      decimals = pContract.pTokenDecimals
     }
     
     if(!amount || isNaN(amount) || amount <= 0 || amount > transactionTokenBalance) {
@@ -439,7 +442,7 @@ class Asset extends Component {
     // console.log('passed amount test')
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress, decimals: decimals } })
   }
 
 
