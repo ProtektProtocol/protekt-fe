@@ -1,5 +1,6 @@
 import config from "../config";
 import async from 'async';
+import BigNumber from 'bignumber.js';
 import {
   COVERAGE_HOLDINGS_RETURNED,
   STAKING_HOLDINGS_RETURNED,
@@ -1772,7 +1773,6 @@ class Store {
 
     var amountToSend = web3.utils.toWei(amount, "ether")
 
-    // change the cDAI decimals - change to add back in all assets programatically into config / store
     if(decimals != 18){
       amountToSend = amount*10**decimals
     }
@@ -1936,11 +1936,12 @@ class Store {
 
     var amountSend = web3.utils.toWei(amount, "ether")
 
-    // below uses deprecated feild from assets
 
     if (asset.decimals !== 18) {
       amountSend = Math.round(amount*10**asset.decimals);
     }
+
+    console.log(amountSend)
 
     yVaultCheckContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
@@ -1968,19 +1969,35 @@ class Store {
   _callWithdrawVault = async (account, amount, vaultContractAddress, decimals, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
+    console.log("\n \n call withdraw vault")
     let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountSend = web3.utils.toWei(amount, "ether")
+
+
+    // console.log(value)
+
+    // console.log(amountSend)
     
     if(decimals!=18){
-      amountSend = amount*10**decimals
+      // amountSend = amount*10**decimals
+      const bigNumberValue = new BigNumber(amount.toString())
+      console.log(bigNumberValue)
+      const value = bigNumberValue.shiftedBy(1 * decimals).decimalPlaces(2).toNumber()
+      amountSend = value.toString()
+      console.log(amountSend)
     }
+    // amountSend = amountSend.toString()
+    // console.log('type: ')
+    // console.log(typeof(amountSend))
+    // console.log(amountSend)
 
     let functionCall = vaultContract.methods.withdraw(amountSend)
     if(vaultContractAddress === 'Ethereum') {
       functionCall = vaultContract.methods.withdrawETH(amountSend)
     }
 
+    
     functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
