@@ -233,7 +233,6 @@ class CoverageHolding extends Component {
 
   render() {
     const { classes, asset } = this.props;
-
     const {
       amount,
       amountError,
@@ -389,12 +388,11 @@ class CoverageHolding extends Component {
       this.setState({ redeemAmountError: true })
       return false
     }
-  
 
     this.setState({ loading: true })
     startLoading()
 
-    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: amountToWithdraw, vaultContractAddress: asset.pTokenAddress } })
+    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: amountToWithdraw, vaultContractAddress: asset.pTokenAddress , decimals: asset.pTokenDecimals} })
   }
 
   onWithdrawAll = () => {

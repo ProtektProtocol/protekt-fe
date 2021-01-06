@@ -411,19 +411,31 @@ class Asset extends Component {
     let transactionTokenBalance = null
     let erc20address = null
     let vaultContractAddress = null
+<<<<<<< HEAD
     let amount = null
+=======
+    let decimals = null
+>>>>>>> master
 
     if(user === "INSURER"){
       transactionTokenBalance = pContract.reserveTokenBalance
       erc20address = pContract.reserveTokenAddress
       vaultContractAddress = pContract.shieldTokenAddress
+<<<<<<< HEAD
       amount = reserveAmount
+=======
+      decimals = pContract.reserveTokenDecimals
+>>>>>>> master
     }
     if(user === "SEEKER"){
       transactionTokenBalance = pContract.underlyingTokenBalance
       erc20address = pContract.underlyingTokenAddress
       vaultContractAddress = pContract.pTokenAddress
+<<<<<<< HEAD
       amount = underlyingAmount
+=======
+      decimals = pContract.pTokenDecimals
+>>>>>>> master
     }
     
     console.log('\n \n inside deposit')
@@ -437,7 +449,7 @@ class Asset extends Component {
     // console.log('passed amount test')
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress } })
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: pContract, erc20address: erc20address, vaultContractAddress: vaultContractAddress, decimals: decimals } })
   }
 
 }

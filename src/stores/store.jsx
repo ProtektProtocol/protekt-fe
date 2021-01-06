@@ -1,5 +1,6 @@
 import config from "../config";
 import async from 'async';
+import BigNumber from 'bignumber.js';
 import {
   COVERAGE_HOLDINGS_RETURNED,
   STAKING_HOLDINGS_RETURNED,
@@ -64,85 +65,17 @@ const Emitter = require('events').EventEmitter;
 const dispatcher = new Dispatcher();
 const emitter = new Emitter();
 
+
 class Store {
   constructor() {
 
+    // on creation - fetch below from store and calculated calculated values
+
+    console.log('\n \n in setup')
+    console.log(config['protektContracts'])
+
     this.store = {
-      protektContracts: [
-        {
-          // TEST Contract Info
-          id: 'TEST-market',
-          name: 'Compound DAI',
-          insuredTokenSymbol: 'DAI',
-          insuredPool: 'Compound',
-          logo: 'cDAI-logo',
-          description: 'A test insurance market on top of the TEST market on TEST.',
-
-          // Display fields
-          costSummaryDisplay: ' 20% COMP',
-          coverageSummaryDisplay: '100% Coverage',
-          strategySummaryDisplay: 'ETH (Not invested)',
-          claimManagerSummaryDisplay: 'DAO vote',
-          costDisplay: `**10-20% COMP** rewards of your deposited DAI will be redirected to Shield Miners. The exact fee depends on the amount of coverage.`,
-          coverageDisplay: `Protection against 1) **smart contract bugs** that allow hackers to steal or lock DAI and 2) risk that **admin keys are stolen** or used to withdraw DAI. Not covered: 1) Risk of a Maker hack or DAI lossing its peg. 2) Risk of flash loan or other financial exploit.`,
-          strategyDisplay: 'Hodling (0% APY)',
-          claimManagerDisplay: `Claims are investigated for a period of **1 week**, and the payout decision is made by a DAO vote.`,
-
-          // pToken
-          underlyingTokenSymbol: 'TESTU',
-          underlyingTokenAddress: '0xf100bDe449A098237A354D800730A155F8f30Cfe',
-          underlyingTokenContractABI: config.vaultContractV4ABI,
-          pTokenSymbol: 'pTESTU',
-          pTokenAddress: '0xAc908F3c66F76Fb177E1066d5F1139488B353305',
-          pTokenContractABI: config.vaultContractV4ABI,
-          feeModelAddress: '0xAc908F3c66F76Fb177E1066d5F1139488B353305',
-
-          // Shield Token
-          reserveTokenSymbol: 'TESTR',
-          reserveTokenAddress: '0x117F767137d2F3809Fe68a27B88d6349f9e9C093',
-          reserveTokenContractABI: config.vaultContractV4ABI,
-          shieldTokenSymbol: 'shTESTR',
-          shieldTokenAddress: '0xE9AE0b42d4E47a05f75E35b235C2EcD6Ce8C96AE',
-          shieldTokenContractABI: config.vaultContractV4ABI,
-          controllerAddress: '0x71C0Ae00157fc1616675cd04Bb3C5e1E59946676',
-          strategyAddress: '0x22c4d7646b2ef0BFEf07c5483e2Bd851303F491f',
-          claimsManagerAddress: '0x067c6d278d0F544ACe67a1CEdf9e99c0024A5677',
-
-          // Calculated Fields
-          underlyingTokenBalance: 0,
-          pTokenBalance: 0,
-          reserveTokenBalance: 0,
-          shieldTokenBalance: 0,
-          shieldRewardApy: `1.40%`,
-          shieldStrategyApy: `0%`,
-          shieldNetApy: `1.40%`,
-          shieldTotalAmountStakedReserve: `1000`,
-          shieldTotalAmountStakedUsd: `$200k`,
-          depositsDisabled: false,
-          withdrawalsDisabled: false,
-          claimableRewardsDisabled: false,
-          lastBlockMeasurement: 10774489,
-
-          // Claims Fields
-          claimStatus: 'Active',
-          activePayoutEvent: false,
-          investigationPeriod: 43200,
-          investigationPeriodDisplay: '1 week',
-          currentInvestigationPeriodEnd: 0,
-
-          // To be Deprecated?
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          measurement: 1e18,
-          price_id: 'ethereum',
-          vaultContractABI: config.vaultContractV4ABI, // To be deprecated
-          vaultSymbol: 'pcDAI', // To be deprecated
-          erc20address: '0x88d11b9e69C3b0B1C32948333BDFd84fd5e4c9ae', // To be deprecated
-          vaultContractAddress: '0x11206fa4DA04A45A7F123f5d24bA5b0F4D39326a',
-          symbol: 'cDAI-logo', // To be deprecated
-        },
-      ],
+      protektContracts: config.protektContracts,
       coverageHoldings: [
       
       ],
@@ -1288,10 +1221,10 @@ class Store {
 
     async.map(protektContracts, (protektContract, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, account, callbackInner) },
-        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.underlyingTokenAddress,protektContract.underlyingTokenDecimals ,account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.pTokenAddress, protektContract.pTokenDecimals,account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.reserveTokenAddress, protektContract.reserveTokenDecimals,account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContract.shieldTokenAddress, protektContract.shieldTokenDecimals,account, callbackInner) },
         (callbackInner) => { this._getWithdrawalsDisabled(web3, protektContract.shieldTokenAddress, config.shieldTokenABI, callbackInner) },
         (callbackInner) => { this._getClaimStatus(web3, protektContract.claimsManagerAddress, account, callbackInner) },
         (callbackInner) => { this._getActivePayoutEvent(web3, protektContract.claimsManagerAddress, account, callbackInner) },
@@ -1335,7 +1268,7 @@ class Store {
 
     async.times(protektContracts.length, (index, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].pTokenAddress,protektContracts[index].pTokenDecimals, account, callbackInner) },
         (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].pTokenAddress, protektContracts[index].pTokenContractABI, account, callBackInner)},
         (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].underlyingTokenSymbol ,callbackInner)},
       ], (err, data) => {
@@ -1381,7 +1314,7 @@ class Store {
 
     async.times(protektContracts.length, (index, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenDecimals, account, callbackInner) },
         (callBackInner) => { this._getPricePerFullShare(web3, protektContracts[index].shieldTokenAddress, protektContracts[index].shieldTokenContractABI, account, callBackInner)},
         (callbackInner) => { this._getTokenUSDPrice(protektContracts[index].reserveTokenSymbol, callbackInner) },
       ], async (err, data) => {
@@ -1475,8 +1408,8 @@ class Store {
     
   }
 
-  _getERC20Balance = async (web3, erc20address, account, callback) => {
-    if(erc20address === 'Ethereum') {
+  _getERC20Balance = async (web3, erc20address, decimals, account, callback) => {
+    if(erc20address === 'Ethereum' ) {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
         callback(null, parseFloat(eth_balance))
@@ -1484,12 +1417,26 @@ class Store {
         console.log(ex)
         return callback(ex)
       }
-    } else {
+    }
+    // } else if(erc20address === "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad" || erc20address === "0x395004f214954eC324F517f3EF1b0eC137c0acD2" ){
+    //     // kovan cDAI & pcDA
+    //   let contract = new web3.eth.Contract(config.erc20ABI, erc20address)
+
+    //   try {
+    //     var balance = await contract.methods.balanceOf(account.address).call({ from: account.address });
+    //     balance = parseFloat(balance)/10**8 // changed to 10 for cDAI
+    //     return callback(null, parseFloat(balance))
+    //   } catch(ex) {
+    //     console.log(ex)
+    //     return callback(ex)
+    //   }
+    // }
+    else {
       let erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
 
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
-        balance = parseFloat(balance)/10**18 // changed to 18 constant as .decimals was deprecated - maybe run this by corbin
+        balance = parseFloat(balance)/10**decimals
         return callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
@@ -1739,7 +1686,7 @@ class Store {
 
   depositVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount, erc20address, vaultContractAddress } = payload.content
+    const { asset, amount, erc20address, vaultContractAddress, decimals } = payload.content
 
     // pass in erc20 address and vault address to deposit and pass in to below
     this._checkApproval(erc20address, account, amount, vaultContractAddress, (err) => {
@@ -1747,7 +1694,7 @@ class Store {
         return emitter.emit(ERROR, err);
       }
 
-      this._callDepositVault(erc20address,vaultContractAddress, account, amount, (err, depositResult) => {
+      this._callDepositVault(erc20address,vaultContractAddress, account, amount, decimals, (err, depositResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -1820,11 +1767,15 @@ class Store {
   /**
    *  Need to pass in contract ABI / add it AS DOES NOT EXIST ANYMORE - add from config?
    */
-  _callDepositVault = async (erc20address,vaultContractAddress, account, amount, callback) => {
+  _callDepositVault = async (erc20address,vaultContractAddress, account, amount, decimals,callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
-    let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
+    let vaultContract = new web3.eth.Contract(config.pTokenABI, vaultContractAddress)
 
     var amountToSend = web3.utils.toWei(amount, "ether")
+
+    if(decimals != 18){
+      amountToSend = amount*10**decimals
+    }
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -1944,7 +1895,10 @@ class Store {
 
   withdrawVault = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount, vaultContractAddress } = payload.content
+    const { asset, amount, vaultContractAddress, decimals } = payload.content
+
+    console.log('\n \n debugging withdraw')
+    console.log(vaultContractAddress)
 
     /*
         Removed below as doesn't seem to be needed?
@@ -1966,7 +1920,7 @@ class Store {
     //     })
     //   })
     // } else {
-      this._callWithdrawVault(account, amount, vaultContractAddress, (err, withdrawResult) => {
+      this._callWithdrawVault(account, amount, vaultContractAddress, decimals, (err, withdrawResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -1982,11 +1936,12 @@ class Store {
 
     var amountSend = web3.utils.toWei(amount, "ether")
 
-    // below uses deprecated feild from assets
 
-    // if (asset.decimals !== 18) {
-    //   amountSend = Math.round(amount*10**asset.decimals);
-    // }
+    if (asset.decimals !== 18) {
+      amountSend = Math.round(amount*10**asset.decimals);
+    }
+
+    console.log(amountSend)
 
     yVaultCheckContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
@@ -2011,26 +1966,27 @@ class Store {
     })
   }
 
-  _callWithdrawVault = async (account, amount, vaultContractAddress, callback) => {
+  _callWithdrawVault = async (account, amount, vaultContractAddress, decimals, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let vaultContract = new web3.eth.Contract(config.vaultContractV4ABI, vaultContractAddress)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    
-    // below deprecated
-
-    // if (asset.decimals !== 18) {
-    //   amountSend = Math.round(amount*10**asset.decimals);
-    // }
 
     
-
+    if(decimals!=18){
+      // amountSend = amount*10**decimals
+      const bigNumberValue = new BigNumber(amount.toString())
+      const value = bigNumberValue.shiftedBy(1 * decimals).decimalPlaces(2).toNumber()
+      amountSend = value.toString()
+    }
+    
     let functionCall = vaultContract.methods.withdraw(amountSend)
     if(vaultContractAddress === 'Ethereum') {
       functionCall = vaultContract.methods.withdrawETH(amountSend)
     }
 
+    
     functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
