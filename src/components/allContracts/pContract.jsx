@@ -411,36 +411,23 @@ class Asset extends Component {
     let transactionTokenBalance = null
     let erc20address = null
     let vaultContractAddress = null
-<<<<<<< HEAD
-    let amount = null
-=======
     let decimals = null
->>>>>>> master
+    let amount = null
 
     if(user === "INSURER"){
       transactionTokenBalance = pContract.reserveTokenBalance
       erc20address = pContract.reserveTokenAddress
       vaultContractAddress = pContract.shieldTokenAddress
-<<<<<<< HEAD
       amount = reserveAmount
-=======
-      decimals = pContract.reserveTokenDecimals
->>>>>>> master
     }
     if(user === "SEEKER"){
       transactionTokenBalance = pContract.underlyingTokenBalance
       erc20address = pContract.underlyingTokenAddress
       vaultContractAddress = pContract.pTokenAddress
-<<<<<<< HEAD
       amount = underlyingAmount
-=======
-      decimals = pContract.pTokenDecimals
->>>>>>> master
     }
     
-    console.log('\n \n inside deposit')
-    console.log(amount)
-    
+
     if(!amount || isNaN(amount) || amount <= 0 || amount > transactionTokenBalance) {
       this.setState({ amountError: true })
       return false
