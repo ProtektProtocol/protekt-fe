@@ -120,6 +120,7 @@ const styles = theme => ({
     paddingLeft: '20px'
   },
   actionButton: {
+    'display': 'none',
     '&:hover': {
       backgroundColor: "#19E7C2",
     },
@@ -434,11 +435,10 @@ class Vault extends Component {
             <div className={ classes.checkbox }>
               <Button
                 className={ classes.actionButton }
-                color="protektGreen"
                 target="_blank"
                 href="https://airtable.com/shra7rmIpLE83v8dM"
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color={'black'}>Add new Protekt Contract</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'}>Add new Protekt Contract</Typography>
               </Button>
             </div>
           </div>
