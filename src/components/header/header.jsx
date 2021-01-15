@@ -76,7 +76,7 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     flex: 1,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xs')]: {
       flex: '0'
     }
   },
@@ -113,8 +113,8 @@ const styles = theme => ({
     marginLeft:'6px'
   },
   name: {
-    paddingLeft: '24px',
-    [theme.breakpoints.down('sm')]: {
+    // paddingLeft: '24px',
+    [theme.breakpoints.down('xs')]: {
       display: 'none',
     }
   }
@@ -197,7 +197,7 @@ class Header extends Component {
           <div className={ classes.links }>
             { this.renderLinkName('contracts', 'All Protekt Contracts') }
             { this.renderLinkName('holdings', 'Holdings') }
-            { this.renderLinkName('how-it-works', 'How it works') }
+            { this.renderLinkName('docs', 'Docs') }
           </div>
           <div className={ classes.account }>
             { address &&
@@ -245,6 +245,10 @@ class Header extends Component {
   nav = (screen) => {
     if(screen === 'cover') {
       window.open("https://yinsure.finance", "_blank")
+      return
+    }
+    if(screen === 'docs') {
+      window.open("https://docs.protektprotocol.com", "_blank")
       return
     }
     this.props.history.push('/'+screen)
