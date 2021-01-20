@@ -1773,9 +1773,14 @@ class Store {
 
     var amountToSend = web3.utils.toWei(amount, "ether")
 
+    console.log(decimals)
     if(decimals != 18){
       amountToSend = amount*10**decimals
+      console.log('hit')
     }
+
+    console.log('\n \n call deposit')
+    console.log(amountToSend)
 
     if(erc20address === 'Ethereum') {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })

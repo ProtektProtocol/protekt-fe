@@ -419,11 +419,13 @@ class Asset extends Component {
       erc20address = pContract.reserveTokenAddress
       vaultContractAddress = pContract.shieldTokenAddress
       amount = reserveAmount
+      decimals = pContract.shieldTokenDecimals
     }
     if(user === "SEEKER"){
       transactionTokenBalance = pContract.underlyingTokenBalance
       erc20address = pContract.underlyingTokenAddress
       vaultContractAddress = pContract.pTokenAddress
+      decimals = pContract.pTokenDecimals
       amount = underlyingAmount
     }
     
