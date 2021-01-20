@@ -71,7 +71,6 @@ class App extends Component {
               background: "#f9fafb"
             }}>
               <Switch>
-                <Route exact path="/how-it-works" render={() => (window.location = "https://corbinpage.github.io/protekt-protocol-docs")} />
                 <Route path="/contracts">
                   <Header />
                   <AllContracts />
